@@ -1,0 +1,2844 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VetUECE 2027.2 | Plataforma Gratuita de Aprovação em Medicina Veterinária</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        uece: {
+                            navy: '#0f294a',
+                            blue: '#1d4ed8',
+                            light: '#eff6ff'
+                        },
+                        vet: {
+                            emerald: '#059669',
+                            dark: '#064e3b',
+                            mint: '#ecfdf5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        .tab-active {
+            border-bottom: 3px solid #059669;
+            color: #059669;
+            font-weight: 700;
+        }
+        .dark .tab-active {
+            border-bottom: 3px solid #34d399;
+            color: #34d399;
+        }
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .animate-pulse-soft {
+            animation: pulse-soft 2.5s infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200 min-h-screen flex flex-col">
+
+    <!-- Toast Notification Container (Substitui alert()) -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Custom Modal Container (Substitui confirm()) -->
+    <div id="custom-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 transform transition-all">
+            <div class="flex items-center gap-3 mb-3 text-amber-600 dark:text-amber-400">
+                <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+                <h3 id="modal-title" class="text-lg font-bold font-display text-slate-900 dark:text-white">Confirmar Ação</h3>
+            </div>
+            <p id="modal-message" class="text-sm text-slate-600 dark:text-slate-300 mb-6 leading-relaxed"></p>
+            <div class="flex justify-end gap-3">
+                <button id="modal-cancel" class="px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition">Cancelar</button>
+                <button id="modal-confirm" class="px-4 py-2 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header & Pomodoro Bar -->
+    <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap items-center justify-between py-3 gap-3">
+                <!-- Brand -->
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-600 to-blue-900 flex items-center justify-center text-white shadow-md">
+                        <i class="fa-solid fa-stethoscope text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-display font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white">
+                                VetUECE <span class="text-emerald-600 dark:text-emerald-400">2027.2</span>
+                            </h1>
+                            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">
+                                100% Foco Banca CEV/UECE
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Medicina Veterinária UECE • Aulas Específicas + Questões CEV (Dez–Abr)</p>
+                    </div>
+                </div>
+
+                <!-- Pomodoro & Controls -->
+                <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+                    <!-- Mini Pomodoro Widget -->
+                    <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-2xl border border-slate-200 dark:border-slate-700">
+                        <i class="fa-solid fa-clock text-emerald-600 dark:text-emerald-400 text-sm"></i>
+                        <span id="pomodoro-mode-badge" class="text-[11px] font-bold uppercase tracking-wider text-blue-900 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/40 px-2 py-0.5 rounded-lg">Foco 50m</span>
+                        <span id="pomodoro-display" class="font-mono font-bold text-base text-slate-900 dark:text-white w-14 text-center">50:00</span>
+                        <div class="flex items-center gap-1">
+                            <button onclick="togglePomodoro()" id="pomodoro-toggle-btn" title="Iniciar/Pausar" class="w-7 h-7 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center text-xs transition shadow-sm">
+                                <i class="fa-solid fa-play"></i>
+                            </button>
+                            <button onclick="resetPomodoro()" title="Reiniciar" class="w-7 h-7 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 flex items-center justify-center text-xs transition">
+                                <i class="fa-solid fa-rotate-right"></i>
+                            </button>
+                            <button onclick="switchPomodoroPreset()" title="Alternar 50/10 e 25/5" class="px-2 h-7 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-[11px] font-semibold text-slate-700 dark:text-slate-200 transition">
+                                50/25
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()" title="Alternar Modo Claro/Escuro" class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-300 transition border border-slate-200 dark:border-slate-700">
+                        <i id="theme-icon" class="fa-solid fa-moon text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="flex overflow-x-auto no-scrollbar gap-1 sm:gap-3 pt-1 border-t border-slate-100 dark:border-slate-800/80" aria-label="Navegação Principal">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="tab-btn tab-active whitespace-nowrap px-3 py-2.5 text-sm font-medium flex items-center gap-2 transition">
+                    <i class="fa-solid fa-chart-pie"></i> Visão Geral
+                </button>
+                <button onclick="switchTab('cronograma')" id="nav-cronograma" class="tab-btn whitespace-nowrap px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-emerald-600 flex items-center gap-2 transition">
+                    <i class="fa-solid fa-calendar-days"></i> Cronograma (Dez–Abr)
+                </button>
+                <button onclick="switchTab('exercicios')" id="nav-exercicios" class="tab-btn whitespace-nowrap px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-emerald-600 flex items-center gap-2 transition">
+                    <i class="fa-solid fa-pen-to-square"></i> Exercícios UECE
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300">CEV</span>
+                </button>
+                <button onclick="switchTab('edital')" id="nav-edital" class="tab-btn whitespace-nowrap px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-emerald-600 flex items-center gap-2 transition">
+                    <i class="fa-solid fa-list-check"></i> Edital Verticalizado
+                </button>
+                <button onclick="switchTab('simulados')" id="nav-simulados" class="tab-btn whitespace-nowrap px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-emerald-600 flex items-center gap-2 transition">
+                    <i class="fa-solid fa-file-pen"></i> Simulados & Redação
+                </button>
+                <button onclick="switchTab('estrategia')" id="nav-estrategia" class="tab-btn whitespace-nowrap px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-emerald-600 flex items-center gap-2 transition">
+                    <i class="fa-solid fa-award"></i> Guia Vet & Playlists UECE
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: DASHBOARD / VISÃO GERAL             -->
+        <!-- ========================================== -->
+        <section id="tab-dashboard" class="tab-content space-y-6">
+            <!-- Hero Motivation Banner -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-950 via-blue-900 to-emerald-800 text-white p-6 sm:p-8 shadow-lg">
+                <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div class="max-w-2xl space-y-2">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-xs font-semibold text-emerald-200">
+                            <i class="fa-solid fa-paw"></i> Foco Total: Medicina Veterinária • Campus Itaperi (CEV/UECE)
+                        </div>
+                        <h2 class="font-display text-2xl sm:text-3xl font-extrabold leading-tight">
+                            Estude 100% no padrão da banca CEV/UECE sem pagar cursinho!
+                        </h2>
+                        <p class="text-sm sm:text-base text-blue-100 leading-relaxed">
+                            Ciclo estruturado de <strong>Dezembro a Abril</strong> com aulas do YouTube direcionadas exclusivamente para a <strong>UECE</strong>, banco próprio de <strong>questões estilo CEV (A, B, C, D)</strong> por assunto, simulados aos sábados e descanso obrigatório aos domingos.
+                        </p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0">
+                        <button onclick="switchTab('cronograma')" class="px-5 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-md transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-play"></i> Cronograma de Hoje
+                        </button>
+                        <button onclick="switchTab('exercicios')" class="px-5 py-2.5 rounded-2xl bg-white/15 hover:bg-white/25 text-white font-bold text-xs transition flex items-center justify-center gap-2 border border-white/25">
+                            <i class="fa-solid fa-pen-to-square"></i> Resolver Questões UECE
+                        </button>
+                    </div>
+                </div>
+                <!-- Decorative background icon -->
+                <i class="fa-solid fa-shield-dog absolute -right-6 -bottom-8 text-9xl text-white/5 pointer-events-none"></i>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Card 1: Blocos Concluídos -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Blocos Estudados</span>
+                        <div class="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="kpi-blocks-done" class="text-3xl font-extrabold font-display text-slate-900 dark:text-white">0</span>
+                        <span id="kpi-blocks-total" class="text-sm text-slate-500 dark:text-slate-400">/ 0 blocos</span>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
+                        <div id="kpi-blocks-bar" class="bg-emerald-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Questões Resolvidas -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Questões Resolvidas</span>
+                        <div class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 flex items-center justify-center">
+                            <i class="fa-solid fa-bullseye"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="kpi-questions-done" class="text-3xl font-extrabold font-display text-slate-900 dark:text-white">0</span>
+                        <span id="kpi-questions-acc" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">0% acerto</span>
+                    </div>
+                    <p id="kpi-questions-target" class="text-xs text-slate-500 dark:text-slate-400 mt-3">Meta total do ciclo: 0 questões</p>
+                </div>
+
+                <!-- Card 3: Simulados Feitos -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Média nos Simulados</span>
+                        <div class="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="kpi-simulados-avg" class="text-3xl font-extrabold font-display text-slate-900 dark:text-white">--%</span>
+                        <span id="kpi-simulados-count" class="text-sm text-slate-500 dark:text-slate-400">(0 realizados)</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-3">Meta corte Vet 1ª Fase: ~55 a 62/85</p>
+                </div>
+
+                <!-- Card 4: Redações UECE -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Redações & Edital</span>
+                        <div class="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                            <i class="fa-solid fa-feather-pointed"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="kpi-redacoes-count" class="text-3xl font-extrabold font-display text-slate-900 dark:text-white">0</span>
+                        <span class="text-sm text-slate-500 dark:text-slate-400">redações • </span>
+                        <span id="kpi-edital-pct" class="text-sm font-bold text-emerald-600 dark:text-emerald-400">0% edital</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-3">Nota máxima UECE: 60 pontos</p>
+                </div>
+            </div>
+
+            <!-- Grid: Pesos Medicina Veterinária + Progresso por Matéria -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Pesos Estratégicos UECE Vet -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                    <div class="flex items-center gap-2 text-blue-900 dark:text-blue-300">
+                        <i class="fa-solid fa-scale-balanced text-lg"></i>
+                        <h3 class="font-display font-bold text-lg">Raio-X: Medicina Veterinária UECE</h3>
+                    </div>
+                    <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                        Na UECE, o vestibular é dividido em <strong>1ª Fase (Conhecimentos Gerais - 85 questões)</strong> e <strong>2ª Fase (4 provas: Redação + 3 Específicas)</strong>. Para Medicina Veterinária (Ciências Biológicas e da Saúde):
+                    </p>
+                    <div class="space-y-3">
+                        <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/60">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-sm text-emerald-900 dark:text-emerald-300">1. Biologia (2ª Fase Específica)</span>
+                                <span class="text-xs font-extrabold px-2 py-0.5 rounded-md bg-emerald-600 text-white">PESO MÁXIMO</span>
+                            </div>
+                            <p class="text-xs text-emerald-800 dark:text-emerald-400 mt-1">20 questões na 2ª fase + 10 na 1ª fase. Foco em Zoologia, Fisiologia Animal/Humana, Citologia, Genética e Ecologia.</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/60">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-sm text-blue-900 dark:text-blue-300">2. Química (2ª Fase Específica)</span>
+                                <span class="text-xs font-extrabold px-2 py-0.5 rounded-md bg-blue-700 text-white">PESO MÁXIMO</span>
+                            </div>
+                            <p class="text-xs text-blue-800 dark:text-blue-400 mt-1">20 questões na 2ª fase + 8 na 1ª fase. Essencial dominar Estequiometria, Soluções, pH/Equilíbrio, Termoquímica e Orgânica.</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-sm text-amber-900 dark:text-amber-300">3. Redação + 3ª Específica</span>
+                                <span class="text-xs font-extrabold px-2 py-0.5 rounded-md bg-amber-600 text-white">DECISIVO</span>
+                            </div>
+                            <p class="text-xs text-amber-800 dark:text-amber-400 mt-1">Redação vale 60 pts (gêneros textuais variados!). A 3ª específica costuma ser Física ou Língua Portuguesa/Estrangeira conforme edital vigente.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progresso por Disciplina -->
+                <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2 text-slate-900 dark:text-white">
+                            <i class="fa-solid fa-bars-progress text-emerald-600"></i>
+                            <h3 class="font-display font-bold text-lg">Progresso por Disciplina (Dezembro a Abril)</h3>
+                        </div>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">Atualizado em tempo real</span>
+                    </div>
+                    <div id="subject-progress-list" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                        <!-- Preenchido via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: CRONOGRAMA SEMANAL (DEZ - ABR)       -->
+        <!-- ========================================== -->
+        <section id="tab-cronograma" class="tab-content hidden space-y-6">
+            <!-- Controles de Mês e Semana -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="font-display font-extrabold text-xl text-slate-900 dark:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-check text-emerald-600"></i> Cronograma Completo: Dezembro a Abril
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                            Segunda a Sexta: Teoria no YouTube + Questões focadas • Sábado: Simulado UECE • Domingo: Descanso Obrigatório.
+                        </p>
+                    </div>
+                    <!-- Filtro de Matéria -->
+                    <div class="flex items-center gap-2">
+                        <label for="subject-filter" class="text-xs font-semibold text-slate-600 dark:text-slate-400">Filtrar matéria:</label>
+                        <select id="subject-filter" onchange="renderSchedule()" class="text-xs sm:text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <option value="ALL">Todas as Disciplinas</option>
+                            <option value="Biologia">Biologia (Peso Vet)</option>
+                            <option value="Química">Química (Peso Vet)</option>
+                            <option value="Física">Física</option>
+                            <option value="Matemática">Matemática</option>
+                            <option value="Linguagens">Linguagens & Literatura UECE</option>
+                            <option value="História">História & Hist. do Ceará</option>
+                            <option value="Geografia">Geografia & Geo. do Ceará</option>
+                            <option value="Filosofia">Filosofia</option>
+                            <option value="Sociologia">Sociologia</option>
+                            <option value="Atualidades">Atualidades</option>
+                            <option value="Redação">Redação UECE</option>
+                            <option value="Simulado">Simulado & Correção</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Seletor de Meses -->
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2" id="month-selector">
+                    <!-- Botões gerados via JS -->
+                </div>
+
+                <!-- Banner do Ciclo Mensal Atual -->
+                <div id="month-cycle-banner" class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <!-- Preenchido via JS -->
+                </div>
+
+                <!-- Seletor de Semanas (Semana 1 a Semana 4) -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-1" id="week-selector">
+                    <!-- Botões gerados via JS -->
+                </div>
+            </div>
+
+            <!-- Grid dos Dias da Semana (Segunda a Domingo) -->
+            <div id="days-container" class="space-y-5">
+                <!-- Cards dos dias gerados via JS -->
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2.5: EXERCÍCIOS PRÓPRIOS DA UECE       -->
+        <!-- ========================================== -->
+        <section id="tab-exercicios" class="tab-content hidden space-y-6">
+            <!-- Header & Filtros -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-xs font-bold mb-1">
+                            <i class="fa-solid fa-check-double"></i> Questões Reais de Provas Anteriores CEV/UECE (A, B, C, D)
+                        </div>
+                        <h2 class="font-display font-extrabold text-xl sm:text-2xl text-slate-900 dark:text-white">
+                            Questões Oficiais que Já Caíram na UECE
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                            Treine com questões autênticas aplicadas nos vestibulares anteriores da CEV/UECE (1ª e 2ª fases), organizadas por disciplina e assunto do seu cronograma.
+                        </p>
+                    </div>
+
+                    <!-- Mini Placar do Banco de Exercícios -->
+                    <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/80 px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 shrink-0">
+                        <div>
+                            <div class="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400">Desempenho no Banco</div>
+                            <div class="flex items-baseline gap-2">
+                                <span id="ex-score-correct" class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">0</span>
+                                <span class="text-xs text-slate-500">acertos de</span>
+                                <span id="ex-score-total" class="text-base font-bold text-slate-800 dark:text-white">0</span>
+                                <span id="ex-score-pct" class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300">0%</span>
+                            </div>
+                        </div>
+                        <button onclick="resetExercisesProgress()" title="Refazer questões do banco" class="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-rose-600 text-xs transition">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Barra de Filtros -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">1. Disciplina</label>
+                        <select id="ex-filter-subject" onchange="onExerciseSubjectChange()" class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="ALL">Todas as Disciplinas</option>
+                            <option value="Biologia">Biologia (Peso 2ª Fase Vet)</option>
+                            <option value="Química">Química (Peso 2ª Fase Vet)</option>
+                            <option value="História">História & História do Ceará</option>
+                            <option value="Geografia">Geografia & Geografia do Ceará</option>
+                            <option value="Linguagens">Linguagens & Obras Literárias UECE</option>
+                            <option value="Matemática">Matemática</option>
+                            <option value="Física">Física</option>
+                            <option value="Filosofia">Filosofia</option>
+                            <option value="Sociologia">Sociologia</option>
+                            <option value="Atualidades">Atualidades</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">2. Assunto do Cronograma</label>
+                        <select id="ex-filter-topic" onchange="renderExercises()" class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="ALL">Todos os Assuntos</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">3. Status</label>
+                        <select id="ex-filter-status" onchange="renderExercises()" class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="ALL">Todas as Questões</option>
+                            <option value="UNANSWERED">Não Respondidas</option>
+                            <option value="WRONG">Somente Erros (Revisão)</option>
+                            <option value="CORRECT">Acertadas</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">4. Buscar palavra-chave</label>
+                        <input type="text" id="ex-search" oninput="renderExercises()" placeholder="Ex: Caatinga, Padre Cícero, Mitose..." class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                </div>
+
+                <!-- Banner de Provas Anteriores CEV/UECE -->
+                <div class="p-3.5 rounded-xl bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="text-xs text-blue-900 dark:text-blue-200">
+                        <strong>Quer baixar cadernos completos da CEV/UECE?</strong> Acesse o acervo oficial de provas anteriores (1ª e 2ª fases) ou busque resoluções em vídeo do assunto selecionado:
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <a id="ex-more-yt-btn" href="https://www.youtube.com/results?search_query=resolucao+questoes+UECE+biologia+quimica" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition inline-flex items-center gap-1.5">
+                            <i class="fa-brands fa-youtube"></i> + Questões UECE em Vídeo
+                        </a>
+                        <a href="https://www.uece.br/cev/" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold transition inline-flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-pdf"></i> Site Oficial CEV/UECE
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Questões UECE -->
+            <div id="exercises-list" class="space-y-5">
+                <!-- Questões renderizadas via JS -->
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: EDITAL VERTICALIZADO UECE           -->
+        <!-- ========================================== -->
+        <section id="tab-edital" class="tab-content hidden space-y-6">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="font-display font-extrabold text-xl text-slate-900 dark:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-emerald-600"></i> Edital Verticalizado CEV/UECE
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                            Marque cada tópico dominado para acompanhar a cobertura completa do programa oficial da UECE.
+                        </p>
+                    </div>
+                    <div class="text-xs font-bold px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300">
+                        Foco 2ª Fase Vet: Biologia & Química
+                    </div>
+                </div>
+                <div id="edital-container" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Gerado via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: SIMULADOS & REDAÇÕES UECE           -->
+        <!-- ========================================== -->
+        <section id="tab-simulados" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Formulário de Registro de Simulado -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm h-fit">
+                    <h2 class="font-display font-bold text-lg text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-plus-circle text-emerald-600"></i> Registrar Simulado / Prova
+                    </h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Acompanhe sua evolução de Dezembro até Abril.</p>
+                    
+                    <form id="simulado-form" onsubmit="addSimulado(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold mb-1">Nome / Edição da Prova UECE</label>
+                            <input type="text" id="sim-nome" required placeholder="Ex: Prova UECE 2024.1 - 1ª Fase" class="w-full text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold mb-1">Mês do Ciclo</label>
+                                <select id="sim-mes" class="w-full text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 outline-none">
+                                    <option value="Dezembro">Dezembro</option>
+                                    <option value="Janeiro">Janeiro</option>
+                                    <option value="Fevereiro">Fevereiro</option>
+                                    <option value="Março">Março</option>
+                                    <option value="Abril">Abril</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold mb-1">Modalidade</label>
+                                <select id="sim-tipo" onchange="updateSimuladoMax()" class="w-full text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 outline-none">
+                                    <option value="1ª Fase (85q)">1ª Fase (85 questões)</option>
+                                    <option value="2ª Fase Vet (60q)">2ª Fase Vet (60 questões)</option>
+                                    <option value="Mini Simulado (40q)">Mini Simulado (40 questões)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-xs font-semibold mb-1">Acertos</label>
+                                <input type="number" id="sim-acertos" required min="0" max="85" placeholder="52" class="w-full text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold mb-1">Total Q.</label>
+                                <input type="number" id="sim-total" required min="1" max="100" value="85" class="w-full text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold mb-1">Redação (0-60)</label>
+                                <input type="number" id="sim-redacao" min="0" max="60" step="0.5" placeholder="48" class="w-full text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold mb-1">Principais Lacunas / Assuntos para Revisar</label>
+                            <textarea id="sim-erros" rows="2" placeholder="Ex: Errei Estequiometria, História do Ceará (Sedição de Juazeiro) e Óptica." class="w-full text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                        </div>
+                        <button type="submit" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-sm transition">
+                            Salvar Resultado do Simulado
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Gráfico de Evolução + Histórico + Checklist Redação UECE -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Gráfico SVG de Desempenho -->
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
+                                <i class="fa-solid fa-chart-area text-blue-600"></i> Curva de Evolução (% de Acertos)
+                            </h3>
+                            <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 font-semibold">
+                                Linha de Corte Vet: ~68% (58/85)
+                            </span>
+                        </div>
+                        <div id="simulados-chart-container" class="w-full overflow-x-auto">
+                            <!-- Gráfico SVG dinâmico -->
+                        </div>
+                    </div>
+
+                    <!-- Checklist de Gêneros Textuais da Redação UECE -->
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                            <div>
+                                <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-pen-nib text-amber-500"></i> Domínio dos Gêneros Textuais UECE (Luma e Ponto)
+                                </h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Diferente do ENEM, a UECE cobra gêneros variados. Pratique todos os principais!</p>
+                            </div>
+                            <a href="https://www.youtube.com/results?search_query=Luma+e+Ponto+generos+textuais+UECE+redacao" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition shrink-0">
+                                <i class="fa-brands fa-youtube"></i> Aulas Luma e Ponto
+                            </a>
+                        </div>
+                        <div id="generos-redacao-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 mt-3">
+                            <!-- Gerado via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Lista de Simulados Registrados -->
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white mb-4">Histórico de Simulados</h3>
+                        <div id="simulados-history-list" class="space-y-3">
+                            <!-- Gerado via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: ESTRATÉGIA VET UECE & CANAIS         -->
+        <!-- ========================================== -->
+        <section id="tab-estrategia" class="tab-content hidden space-y-6">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <h2 class="font-display font-extrabold text-xl text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                    <i class="fa-brands fa-youtube text-rose-600"></i> Curadoria de Playlists & Aulas Específicas para a UECE
+                </h2>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">
+                    Todos os botões do seu cronograma foram configurados para buscar diretamente <strong>aulas, revisões e resoluções comentadas da banca CEV/UECE</strong> no YouTube, sem depender de um único professor generalista:
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Playlist 1 -->
+                    <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-xs font-bold">Peso 2ª Fase Vet</span>
+                                <i class="fa-brands fa-youtube text-rose-600 text-xl"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Biologia & Química CEV/UECE</h3>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                                Aulas teóricas direcionadas e resoluções de 1ª e 2ª fases da UECE (Zoologia, Fisiologia, Citologia, Estequiometria, Soluções e Orgânica).
+                            </p>
+                        </div>
+                        <a href="https://www.youtube.com/results?search_query=UECE+biologia+quimica+2+fase+resolucao+aula" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition">
+                            Explorar Aulas UECE Bio & Quím <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+
+                    <!-- Playlist 2 -->
+                    <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="px-2.5 py-1 rounded-lg bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 text-xs font-bold">Diferencial Regional</span>
+                                <i class="fa-brands fa-youtube text-rose-600 text-xl"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">História & Geografia do Ceará (UECE)</h3>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                                Aulas específicas para o vestibular da UECE sobre Ciclo do Gado, Abolição de 1884, Sedição de Juazeiro, Caldeirão, Caatinga, Castanhão e Complexo do Pecém.
+                            </p>
+                        </div>
+                        <a href="https://www.youtube.com/results?search_query=UECE+historia+e+geografia+do+ceara+aula+completa" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 text-white text-xs font-semibold transition">
+                            Explorar Aulas Ceará UECE <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+
+                    <!-- Playlist 3 -->
+                    <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="px-2.5 py-1 rounded-lg bg-rose-100 dark:bg-rose-900/50 text-rose-800 dark:text-rose-300 text-xs font-bold">Obras & Gramática CEV</span>
+                                <i class="fa-brands fa-youtube text-rose-600 text-xl"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Linguagens & Obras Literárias UECE</h3>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                                Análises completas das obras literárias cobradas pela CEV/UECE, literatura cearense (José de Alencar, Rachel de Queiroz, Patativa) e sintaxe estilo UECE.
+                            </p>
+                        </div>
+                        <a href="https://www.youtube.com/results?search_query=UECE+obras+literarias+literatura+cearense+portugues" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 text-white text-xs font-semibold transition">
+                            Explorar Aulas Linguagens UECE <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+
+                    <!-- Playlist 4 -->
+                    <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="px-2.5 py-1 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 text-xs font-bold">Exatas Direcionadas</span>
+                                <i class="fa-brands fa-youtube text-rose-600 text-xl"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Matemática & Física Foco UECE</h3>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                                Aulas focadas na cobrança direta e algébrica da UECE: Geometria Plana/Espacial/Analítica, Funções, Trigonometria, Mecânica, Termologia e Eletricidade.
+                            </p>
+                        </div>
+                        <a href="https://www.youtube.com/results?search_query=UECE+matematica+e+fisica+revisao+questoes+comentadas" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 text-white text-xs font-semibold transition">
+                            Explorar Aulas Exatas UECE <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+
+                    <!-- Playlist 5 -->
+                    <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="px-2.5 py-1 rounded-lg bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300 text-xs font-bold">Humanas Objetivas</span>
+                                <i class="fa-brands fa-youtube text-rose-600 text-xl"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Filosofia, Sociologia & Atualidades UECE</h3>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                                Conceitos clássicos e contemporâneos cobrados de forma direta pela banca CEV/UECE, além de revisões de atualidades regionais e globais.
+                            </p>
+                        </div>
+                        <a href="https://www.youtube.com/results?search_query=UECE+filosofia+sociologia+atualidades+revisao" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 text-white text-xs font-semibold transition">
+                            Explorar Aulas Humanas UECE <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+
+                    <!-- Playlist 6 -->
+                    <div class="p-5 rounded-2xl border border-orange-200 dark:border-orange-800 bg-orange-50/60 dark:bg-orange-950/30 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="px-2.5 py-1 rounded-lg bg-orange-600 text-white text-xs font-bold">Gêneros Textuais CEV</span>
+                                <i class="fa-solid fa-pen-nib text-orange-600 text-xl"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Redação Padrão UECE (60 Pontos)</h3>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                                Aulas específicas sobre os critérios de correção da UECE e como estruturar Artigo de Opinião, Carta Aberta, Carta do Leitor, Editorial e Crônica.
+                            </p>
+                        </div>
+                        <a href="https://www.youtube.com/results?search_query=redacao+UECE+generos+textuais+criterios+de+correcao" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold transition">
+                            Explorar Aulas Redação UECE <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estratégia de Ouro para Passar sem Cursinho -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-amber-500"></i> Método de Estudo "Nota Máxima Vet UECE"
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700 dark:text-slate-300">
+                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                        <h4 class="font-bold text-emerald-700 dark:text-emerald-400 mb-1">1. Regra 40% Aula / 60% Questões CEV</h4>
+                        <p class="text-xs leading-relaxed">A UECE é uma prova conteudista e objetiva, muito diferente do ENEM. Não fique apenas assistindo videoaulas passivamente: faça as <strong>15 a 25 questões diárias</strong> marcadas no cronograma buscando provas antigas da UECE (disponíveis gratuitamente no site da CEV/UECE).</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                        <h4 class="font-bold text-blue-700 dark:text-blue-400 mb-1">2. Caderno de Erros & Flashcards</h4>
+                        <p class="text-xs leading-relaxed">Toda questão que você errar no sábado (dia de simulado) ou durante a semana deve ir para um caderno físico simples dividido por matéria. Releia seus erros toda sexta-feira à noite antes do simulado.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                        <h4 class="font-bold text-amber-700 dark:text-amber-400 mb-1">3. Domínio Regional (Ceará)</h4>
+                        <p class="text-xs leading-relaxed">História do Ceará e Geografia do Ceará garantem pontos preciosos que muitos candidatos perdem. Estude com atenção os movimentos sociais cearenses, seca, recursos hídricos (Açude Castanhão, Transposição) e literatura cearense (Rachel de Queiroz, José de Alencar, Patativa do Assaré).</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                        <h4 class="font-bold text-purple-700 dark:text-purple-400 mb-1">4. Domingo Sagrado de Descanso</h4>
+                        <p class="text-xs leading-relaxed">Estudar de Dezembro a Abril exige saúde mental. O domingo é 100% livre para descansar, dormir bem, ficar com a família e recarregar a dopamina para começar a segunda-feira no ritmo máximo.</p>
+                    </div>
+                </div>
+
+                <!-- Reset Data Option -->
+                <div class="pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <span class="text-xs text-slate-500">Seus dados ficam salvos automaticamente no navegador deste dispositivo.</span>
+                    <button onclick="confirmResetAll()" class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-400 text-xs font-semibold transition border border-rose-200 dark:border-rose-800">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Zerar Todo o Progresso
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-5 mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-paw text-emerald-600"></i>
+                <span><strong>VetUECE 2027.2</strong> — Feito para a futura Médica Veterinária da Universidade Estadual do Ceará.</span>
+            </div>
+            <div>
+                <span>100% Gratuito • Estudo Focado via YouTube • Dezembro a Abril</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT: DADOS COMPLETOS & LÓGICA       -->
+    <!-- ========================================== -->
+    <script>
+        // =========================================================================
+        // 1. METADADOS DOS MESES, CRONOGRAMA COMPLETO (DEZ - ABR) & EDITAL UECE
+        // =========================================================================
+        const MONTHS_META = {
+            dezembro: {
+                id: 'dezembro',
+                name: 'Dezembro',
+                subtitle: 'Ciclo 1 — Base Sólida & Fundamentos UECE',
+                description: 'Construção da base teórica nas disciplinas de maior peso para Medicina Veterinária (Biologia e Química), início de História/Geografia do Ceará e introdução aos gêneros textuais da redação UECE.'
+            },
+            janeiro: {
+                id: 'janeiro',
+                name: 'Janeiro',
+                subtitle: 'Ciclo 2 — Aprofundamento em Ciências da Natureza & Exatas',
+                description: 'Aprofundamento em Fisiologia, Zoologia, Estequiometria, Soluções, Funções, Mecânica e obras literárias cobradas pela CEV/UECE, com aumento gradual de questões.'
+            },
+            fevereiro: {
+                id: 'fevereiro',
+                name: 'Fevereiro',
+                subtitle: 'Ciclo 3 — Consolidação Regional, Humanas & 2ª Fase Vet',
+                description: 'Foco intenso em temas de alto rendimento da UECE (História e Geografia do Ceará, Genética, Ecologia, Química Orgânica, Termodinâmica) e redações semanais.'
+            },
+            marco: {
+                id: 'marco',
+                name: 'Março',
+                subtitle: 'Ciclo 4 — Padrão CEV, Revisão Ativa & Simulados Intensivos',
+                description: 'Treinamento intensivo no estilo de cobrança da banca CEV/UECE, resolução massiva de provas anteriores, revisão de erros recorrentes e prática de gêneros variados.'
+            },
+            abril: {
+                id: 'abril',
+                name: 'Abril',
+                subtitle: 'Ciclo 5 — Reta Final Estratégica, Pontos Quentes & Confiança',
+                description: 'Revisão direcionada aos assuntos de maior incidência na UECE, consolidação de fórmulas e conceitos-chave, simulados cronometrados e gestão emocional.'
+            }
+        };
+
+        function buildUeceYoutubeQuery(block) {
+            const subj = block.subject || '';
+            const topic = (block.topic || '').replace(/\([^)]*\)/g, '').trim();
+            if (subj === 'Redação') {
+                return `redacao UECE ${topic} aula`;
+            }
+            if (subj === 'Simulado') {
+                return `resolucao simulado prova UECE questoes comentadas`;
+            }
+            if (topic.toLowerCase().includes('ceará') || topic.toLowerCase().includes('cearense')) {
+                return `UECE ${topic} aula completa`;
+            }
+            return `UECE ${subj} ${topic} aula`;
+        }
+
+        function formatUeceChannelTag(_channel, subject) {
+            const map = {
+                Biologia: 'Foco CEV/UECE • Biologia',
+                Química: 'Foco CEV/UECE • Química',
+                Matemática: 'Foco CEV/UECE • Matemática',
+                Física: 'Foco CEV/UECE • Física',
+                Linguagens: 'Foco CEV/UECE • Linguagens & Obras',
+                História: 'Foco CEV/UECE • História & Ceará',
+                Geografia: 'Foco CEV/UECE • Geografia & Ceará',
+                Filosofia: 'Foco CEV/UECE • Filosofia',
+                Sociologia: 'Foco CEV/UECE • Sociologia',
+                Atualidades: 'Foco CEV/UECE • Atualidades',
+                Redação: 'Foco CEV/UECE • Redação',
+                Simulado: 'Simulado Padrão CEV/UECE'
+            };
+            return map[subject] || 'Foco CEV/UECE';
+        }
+
+        function createWeekDays(weekNum, monthKey, config) {
+            const p = `${monthKey}-w${weekNum}`;
+            return [
+                {
+                    day: 'Segunda-feira',
+                    focus: 'Ciências da Natureza (Peso Máximo Veterinária)',
+                    blocks: [
+                        { id: `${p}-mon-1`, subject: 'Biologia', topic: config.bio1, questions: 20, priority: true },
+                        { id: `${p}-mon-2`, subject: 'Química', topic: config.qui1, questions: 20, priority: true }
+                    ]
+                },
+                {
+                    day: 'Terça-feira',
+                    focus: 'Exatas & Linguagens / Obras Literárias UECE',
+                    blocks: [
+                        { id: `${p}-tue-1`, subject: 'Matemática', topic: config.mat1, questions: 15, priority: false },
+                        { id: `${p}-tue-2`, subject: 'Linguagens', topic: config.lin1, questions: 15, priority: true }
+                    ]
+                },
+                {
+                    day: 'Quarta-feira',
+                    focus: 'História (Brasil & Ceará) + Física',
+                    blocks: [
+                        { id: `${p}-wed-1`, subject: 'História', topic: config.his1, questions: 15, priority: true },
+                        { id: `${p}-wed-2`, subject: 'Física', topic: config.fis1, questions: 15, priority: false }
+                    ]
+                },
+                {
+                    day: 'Quinta-feira',
+                    focus: 'Geografia (Geral & Ceará) + Filosofia / Sociologia',
+                    blocks: [
+                        { id: `${p}-thu-1`, subject: 'Geografia', topic: config.geo1, questions: 15, priority: true },
+                        { id: `${p}-thu-2`, subject: 'Filosofia', topic: config.fil1, questions: 10, priority: false },
+                        { id: `${p}-thu-3`, subject: 'Sociologia', topic: config.soc1, questions: 10, priority: false }
+                    ]
+                },
+                {
+                    day: 'Sexta-feira',
+                    focus: 'Atualidades, Redação UECE & Revisão de Biologia/Química',
+                    blocks: [
+                        { id: `${p}-fri-1`, subject: 'Atualidades', topic: config.atu1, questions: 10, priority: false },
+                        { id: `${p}-fri-2`, subject: 'Redação', topic: config.red1, questions: 1, priority: true, isEssay: true },
+                        { id: `${p}-fri-3`, subject: 'Biologia', topic: config.bio2, questions: 15, priority: true }
+                    ]
+                },
+                {
+                    day: 'Sábado',
+                    focus: 'Dia Oficial de Simulado Padrão UECE & Correção',
+                    isSimuladoDay: true,
+                    blocks: [
+                        { id: `${p}-sat-1`, subject: 'Simulado', topic: config.sim1, questions: config.simQuestions || 60, priority: true }
+                    ]
+                }
+            ];
+        }
+
+        const SCHEDULE_DATA = {
+            dezembro: [
+                {
+                    week: 1,
+                    title: 'Semana 1 de Dezembro — Fundamentos Celulares, Química Geral & Ceará',
+                    days: createWeekDays(1, 'dez', {
+                        bio1: 'Bioquímica Celular: Água, Sais Minerais, Carboidratos e Lipídios',
+                        qui1: 'Atomística, Modelos Atômicos, Distribuição Eletrônica e Tabela Periódica',
+                        mat1: 'Conjuntos Numéricos, Operações Básicas, Potenciação e Radiciação',
+                        lin1: 'Interpretação de Textos, Coesão e Coerência no Padrão UECE',
+                        his1: 'História do Ceará: Colonização, Ciclo do Gado e Charqueadas',
+                        fis1: 'Fundamentos do Movimento, Velocidade Média e MRU',
+                        geo1: 'Geografia do Ceará: Compartimentação do Relevo e Brejos de Altitude',
+                        fil1: 'Introdução à Filosofia, Mito e Razão na Grécia Antiga',
+                        soc1: 'Surgimento da Sociologia e os Três Clássicos (Comte, Durkheim, Marx)',
+                        atu1: 'Meio Ambiente, Sustentabilidade e Mudanças Climáticas no Semiárido',
+                        red1: 'Estrutura da Redação UECE e Critérios da Banca (60 pts)',
+                        bio2: 'Revisão Ativa: Citologia e Membrana Plasmática (Transportes)',
+                        sim1: 'Simulado Diagnóstico UECE (1ª Fase Adaptada — Foco em Ritmo de Prova)',
+                        simQuestions: 60
+                    })
+                },
+                {
+                    week: 2,
+                    title: 'Semana 2 de Dezembro — Proteínas/Enzimas, Ligações Químicas & Funções',
+                    days: createWeekDays(2, 'dez', {
+                        bio1: 'Proteínas, Enzimas, Vitaminas e Ácidos Nucleicos (DNA e RNA)',
+                        qui1: 'Ligações Químicas (Iônica, Covalente, Metálica), Geometria e Polaridade',
+                        mat1: 'Funções: Conceito, Domínio, Imagem e Função Afim (1º Grau)',
+                        lin1: 'Literatura Cearense: José de Alencar (Iracema e O Sertanejo)',
+                        his1: 'História do Ceará: Confederação do Equador e Abolição de 1884',
+                        fis1: 'MRUV, Gráficos da Cinemática e Queda Livre / Lançamento Vertical',
+                        geo1: 'Geografia do Ceará: Clima Tropical Semiárido e Dinâmica das Chuvas',
+                        fil1: 'Sócrates, Platão (Mundo das Ideias) e Aristóteles',
+                        soc1: 'Émile Durkheim: Fato Social, Solidariedade e Coesão',
+                        atu1: 'Transição Energética, Energia Eólica e Solar no Nordeste',
+                        red1: 'Gênero Textual: Artigo de Opinião (Título, Tese e Argumentação)',
+                        qui2: 'Revisão Ativa: Estequiometria Básica e Balanceamento',
+                        sim1: 'Simulado 02 UECE — Natureza, Matemática e Linguagens',
+                        simQuestions: 60
+                    })
+                },
+                {
+                    week: 3,
+                    title: 'Semana 3 de Dezembro — Organelas/Metabolismo, Funções Inorgânicas & Vetores',
+                    days: createWeekDays(3, 'dez', {
+                        bio1: 'Organelas Citoplasmáticas, Respiração Celular, Fermentação e Fotossíntese',
+                        qui1: 'Funções Inorgânicas: Ácidos, Bases, Sais e Óxidos',
+                        mat1: 'Função Quadrática (2º Grau), Vértice e Inequações',
+                        lin1: 'Sintaxe do Período Simples: Sujeito, Predicado e Complementos',
+                        his1: 'História do Ceará: Padre Cícero, Sedição de Juazeiro e Caldeirão',
+                        fis1: 'Leis de Newton, Força de Atrito e Aplicações Dinâmicas',
+                        geo1: 'Geografia do Ceará: Bacias Hidrográficas, Açude Castanhão e Transposição',
+                        fil1: 'Filosofia Medieval: Patrística (Santo Agostinho) e Escolástica (São Tomás)',
+                        soc1: 'Max Weber: Ação Social, Tipos de Dominação e Racionalidade',
+                        atu1: 'Segurança Alimentar, Produção Animal e Saúde Única (One Health)',
+                        red1: 'Gênero Textual: Carta Aberta (Destinatário, Tom e Proposta)',
+                        bio2: 'Revisão Ativa: Divisão Celular (Mitose e Meiose)',
+                        sim1: 'Simulado 03 UECE — Humanas, Linguagens e Ciências da Natureza',
+                        simQuestions: 60
+                    })
+                },
+                {
+                    week: 4,
+                    title: 'Semana 4 de Dezembro — Embriologia, Estequiometria & Geometria Plana',
+                    days: createWeekDays(4, 'dez', {
+                        bio1: 'Embriologia Animal: Segmentação, Gastrulação, Organogênese e Anexos Embrionários',
+                        qui1: 'Cálculo Estequiométrico: Mol, Massa Molar, Rendimento e Reagente Limitante',
+                        mat1: 'Geometria Plana: Ângulos, Triângulos, Semelhança e Relações Métricas',
+                        lin1: 'Concordância Verbal e Nominal + Regência e Crase (Foco UECE)',
+                        his1: 'Brasil Colônia: Economia Açucareira, Mineração e Movimentos Nativistas',
+                        fis1: 'Trabalho, Energia Mecânica, Conservação da Energia e Potência',
+                        geo1: 'Geografia Física: Estrutura Geológica, Relevo Brasileiro e Solos',
+                        fil1: 'Filosofia Moderna: Racionalismo (Descartes) e Empirismo (Locke, Hume)',
+                        soc1: 'Karl Marx: Mais-Valia, Luta de Classes e Ideologia',
+                        atu1: 'Urbanização Brasileira, Mobilidade e Desigualdades Regionais',
+                        red1: 'Gênero Textual: Carta do Leitor (Argumentação Direta e Objetiva)',
+                        qui2: 'Revisão Ativa: Soluções, Concentração e Diluição',
+                        sim1: 'Simulado Completo de Fechamento de Dezembro (Padrão CEV/UECE)',
+                        simQuestions: 85
+                    })
+                }
+            ],
+            janeiro: [
+                {
+                    week: 1,
+                    title: 'Semana 1 de Janeiro — Histologia Animal, Soluções & Trigonometria',
+                    days: createWeekDays(1, 'jan', {
+                        bio1: 'Histologia Animal: Tecidos Epitelial, Conjuntivo (Ósseo, Cartilaginoso, Sangue)',
+                        qui1: 'Soluções: Concentração Comum, Molaridade, Título, Diluição e Misturas',
+                        mat1: 'Trigonometria no Triângulo Retângulo, Ciclo Trigonométrico e Funções',
+                        lin1: 'Literatura Cearense: Rachel de Queiroz (O Quinze e Memorial de Maria Moura)',
+                        his1: 'Brasil Império: Primeiro Reinado, Período Regencial e Segundo Reinado',
+                        fis1: 'Impulso, Quantidade de Movimento e Colisões Mecânicas',
+                        geo1: 'Climatologia: Massas de Ar, Fenômenos El Niño / La Niña e Biomas Brasileiros',
+                        fil1: 'Contratualismo: Hobbes, Locke e Rousseau',
+                        soc1: 'Cidadania, Direitos Civis, Políticos e Sociais no Brasil',
+                        atu1: 'Geopolítica Global, Conflitos Internacionais e Blocos Econômicos',
+                        red1: 'Gênero Textual: Editorial (Linguagem Impessoal e Posicionamento Institucional)',
+                        bio2: 'Revisão Ativa: Tecidos Muscular e Nervoso + Sinapses',
+                        sim1: 'Simulado 05 UECE — 1ª Fase Completa (85 Questões)',
+                        simQuestions: 85
+                    })
+                },
+                {
+                    week: 2,
+                    title: 'Semana 2 de Janeiro — Fisiologia Animal (Digestão/Circulação) & Termoquímica',
+                    days: createWeekDays(2, 'jan', {
+                        bio1: 'Fisiologia Comparada: Digestão, Respiração e Circulação nos Vertebrados',
+                        qui1: 'Termoquímica: Entalpia, Lei de Hess, Energia de Ligação e Cinética Química',
+                        mat1: 'Progressões (PA e PG), Soma dos Termos e Matemática Financeira',
+                        lin1: 'Figuras de Linguagem, Semântica e Morfologia na Banca UECE',
+                        his1: 'Primeira República (República Velha): Coronelismo, Café-com-Leite e Revoltas',
+                        fis1: 'Termometria, Dilatação Térmica e Calorimetria (Calor Sensível e Latente)',
+                        geo1: 'Geografia do Ceará: População, Urbanização e Metropolização de Fortaleza',
+                        fil1: 'Iluminismo e Ética Kantiana (Imperativo Categórico)',
+                        soc1: 'Movimentos Sociais, Feminismo, Movimento Negro e Questão Agrária',
+                        atu1: 'Biotecnologia, Edição Genética e Avanços na Saúde Animal',
+                        red1: 'Prática de Redação UECE: Coesão Referencial e Vocabulário Preciso',
+                        qui2: 'Revisão Ativa: Equilíbrio Químico, Kc, Kp e Deslocamento',
+                        sim1: 'Simulado 06 UECE — 2ª Fase Vet (Biologia, Química e Específica)',
+                        simQuestions: 60
+                    })
+                },
+                {
+                    week: 3,
+                    title: 'Semana 3 de Janeiro — Fisiologia (Excreção/Endócrino/Imune) & Equilíbrio/pH',
+                    days: createWeekDays(3, 'jan', {
+                        bio1: 'Fisiologia: Sistema Excretor (Nefron), Endócrino, Nervoso e Imunológico',
+                        qui1: 'Equilíbrio Químico, Hidrólise Salina, pH, pOH e Produto de Solubilidade (Kps)',
+                        mat1: 'Análise Combinatória: Princípio Fundamental, Arranjos, Combinações e Probabilidade',
+                        lin1: 'Modernismo Brasileiro (1ª, 2ª e 3ª Gerações) e Poesia Social Nordestina',
+                        his1: 'Era Vargas (1930–1945): Governo Provisório, Constitucional e Estado Novo',
+                        fis1: 'Termodinâmica: 1ª e 2ª Leis da Termodinâmica e Máquinas Térmicas',
+                        geo1: 'Geografia do Ceará: Complexo do Pecém, ZPE, Indústria e Agronegócio',
+                        fil1: 'Filosofia Contemporânea: Nietzsche, Escola de Frankfurt e Existencialismo',
+                        soc1: 'Indústria Cultural, Meios de Comunicação e Sociedade do Consumo',
+                        atu1: 'Crise Hídrica, Gestão de Recursos Hídricos e Desertificação',
+                        red1: 'Gênero Textual: Crônica Argumentativa ou Narrativa de Reflexão',
+                        bio2: 'Revisão Ativa: Zoologia dos Invertebrados (Poríferos a Artrópodes)',
+                        sim1: 'Simulado 07 UECE — 1ª Fase Completa (85 Questões)',
+                        simQuestions: 85
+                    })
+                },
+                {
+                    week: 4,
+                    title: 'Semana 4 de Janeiro — Zoologia dos Vertebrados & Eletroquímica',
+                    days: createWeekDays(4, 'jan', {
+                        bio1: 'Zoologia dos Vertebrados: Peixes, Anfíbios, Répteis, Aves e Mamíferos',
+                        qui1: 'Eletroquímica: Pilhas, Potenciais de Redução, Eletrólise Ígnea e Aquosa',
+                        mat1: 'Geometria Espacial: Prismas, Pirâmides, Cilindros, Cones e Esferas',
+                        lin1: 'Pontuação, Orações Subordinadas e Coordenadas no Estilo UECE',
+                        his1: 'República Populista (1946–1964) e Ditadura Civil-Militar no Brasil (1964–1985)',
+                        fis1: 'Óptica Geométrica: Reflexão, Espelhos Planos/Esféricos, Refração e Lentes',
+                        geo1: 'Geografia Agrária: Estrutura Fundiária, Revolução Verde e Pecuária Brasileira',
+                        fil1: 'Epistemologia e Filosofia da Ciência (Popper, Kuhn)',
+                        soc1: 'Trabalho, Globalização, Flexibilização e Novas Tecnologias',
+                        atu1: 'Zoonoses Emergentes, Resistência Antimicrobiana e Saúde Pública',
+                        red1: 'Revisão de Gêneros Textuais: Adaptação ao Comando da Banca CEV',
+                        qui2: 'Revisão Ativa: Introdução à Química Orgânica e Cadeias Carbônicas',
+                        sim1: 'Simulado de Encerramento de Janeiro (Padrão CEV/UECE)',
+                        simQuestions: 85
+                    })
+                }
+            ],
+            fevereiro: [
+                {
+                    week: 1,
+                    title: 'Semana 1 de Fevereiro — Genética Clássica, Funções Orgânicas & Geometria Analítica',
+                    days: createWeekDays(1, 'fev', {
+                        bio1: 'Genética: 1ª e 2ª Leis de Mendel, Heredogramas, Polialelia e Sistema ABO/Rh',
+                        qui1: 'Funções Orgânicas: Hidrocarbonetos, Álcoois, Éteres, Aldeídos, Cetonas, Ácidos e Aminas',
+                        mat1: 'Geometria Analítica: Ponto, Reta, Circunferência e Cônicas',
+                        lin1: 'Literatura Cearense: Patativa do Assaré, Domingos Olímpio e Obras UECE',
+                        his1: 'História do Ceará Contemporâneo: Política dos Coronéis ao Governo das Mudanças',
+                        fis1: 'Ondulatória: Elementos da Onda, Fenômenos Ondulatórios, Som e Efeito Doppler',
+                        geo1: 'Fontes de Energia, Matriz Energética Brasileira e Hidrogênio Verde',
+                        fil1: 'Filosofia Política: Democracia, Justiça, Liberdade e Direitos Humanos',
+                        soc1: 'Estado, Poder, Violência Simbólica e Estrutura Social',
+                        atu1: 'Economia Digital, Inteligência Artificial e Impactos no Mercado de Trabalho',
+                        red1: 'Redação Completa UECE (Tema Atualidade/Cidadania — Cronometrada)',
+                        bio2: 'Revisão Ativa: Genética Molecular (DNA, RNA, Código Genético e Mutação)',
+                        sim1: 'Simulado 09 UECE — 2ª Fase Vet (Foco em Biologia e Química)',
+                        simQuestions: 60
+                    })
+                },
+                {
+                    week: 2,
+                    title: 'Semana 2 de Fevereiro — Biotecnologia/Evolução, Isomeria & Números Complexos/Polinômios',
+                    days: createWeekDays(2, 'fev', {
+                        bio1: 'Engenharia Genética, Transgênicos, Clonagem e Evolução (Darwin, Lamarck, Genética de Populações)',
+                        qui1: 'Isomeria Plana e Espacial (Geométrica Cis/Trans e Óptica) + Reações Orgânicas',
+                        mat1: 'Matrizes, Determinantes, Sistemas Lineares, Números Complexos e Polinômios',
+                        lin1: 'Variação Linguística, Norma Culta, Gêneros e Tipologia Textual',
+                        his1: 'Idade Contemporânea: Revolução Francesa, Revolução Industrial e Imperialismo',
+                        fis1: 'Eletrostática: Carga Elétrica, Lei de Coulomb, Campo Elétrico e Potencial',
+                        geo1: 'Cartografia: Escalas, Projeções Cartográficas, Fusos Horários e Sensoriamento Remoto',
+                        fil1: 'Estética, Arte, Cultura e Verdade na Filosofia',
+                        soc1: 'Desigualdade de Gênero, Raça e Etnia na Formação Brasileira',
+                        atu1: 'Conservação da Biodiversidade, Caatinga e Unidades de Conservação',
+                        red1: 'Redação Completa UECE: Construção de Repertório Legitimado',
+                        qui2: 'Revisão Ativa: Polímeros, Bioquímica Orgânica e Separação de Misturas',
+                        sim1: 'Simulado 10 UECE — 1ª Fase Completa (85 Questões)',
+                        simQuestions: 85
+                    })
+                },
+                {
+                    week: 3,
+                    title: 'Semana 3 de Fevereiro — Ecologia, Ciclos & Revisão Geral de Química',
+                    days: createWeekDays(3, 'fev', {
+                        bio1: 'Ecologia: Cadeias/Teias Alimentares, Pirâmides, Ciclos Biogeoquímicos e Sucessão Ecológica',
+                        qui1: 'Revisão Geral Química: Estequiometria, Soluções, Equilíbrio e Orgânica (Foco 2ª Fase)',
+                        mat1: 'Revisão Matemática: Funções, Geometria Plana/Espacial e Probabilidade',
+                        lin1: 'Análise de Textos Literários e Não Literários da Banca CEV/UECE',
+                        his1: 'Século XX: 1ª Guerra, Crise de 1929, Nazifascismo, 2ª Guerra e Guerra Fria',
+                        fis1: 'Eletrodinâmica: Corrente Elétrica, Resistores, Leis de Ohm, Circuitos e Potência',
+                        geo1: 'Geografia do Ceará: Turismo, Economia Criativa, Infraestrutura e Desafios Sociais',
+                        fil1: 'Revisão Filosofia UECE: Clássicos, Modernos e Contemporâneos',
+                        soc1: 'Revisão Sociologia UECE: Clássicos, Cidadania e Movimentos Sociais',
+                        atu1: 'Relações Internacionais, Multipolaridade e Comércio Global',
+                        red1: 'Redação Completa UECE: Revisão Gramatical e Clareza Argumentativa',
+                        bio2: 'Revisão Ativa: Relações Ecológicas e Desequilíbrios Ambientais',
+                        sim1: 'Simulado 11 UECE — 2ª Fase Vet (60 Questões)',
+                        simQuestions: 60
+                    })
+                },
+                {
+                    week: 4,
+                    title: 'Semana 4 de Fevereiro — Botânica, Parasitologia & Eletromagnetismo',
+                    days: createWeekDays(4, 'fev', {
+                        bio1: 'Botânica (Briófitas a Angiospermas, Histologia e Fisiologia Vegetal) + Parasitologia/Doenças',
+                        qui1: 'Revisão Foco UECE: Radioatividade, Propriedades Coligativas e Velocidade das Reações',
+                        mat1: 'Revisão Intensiva de Questões de Matemática da 1ª Fase UECE',
+                        lin1: 'Revisão de Literatura Brasileira e Cearense + Gramática Aplicada',
+                        his1: 'Nova República (1985–Atualidade) e História do Ceará no Século XXI',
+                        fis1: 'Magnetismo e Eletromagnetismo: Ímãs, Campo Magnético, Força Magnética e Indução',
+                        geo1: 'Geografia Regional Brasileira e Globalização',
+                        fil1: 'Ética Aplicada, Bioética e Direitos dos Animais',
+                        soc1: 'Cultura, Patrimônio Material e Imaterial e Identidades',
+                        atu1: 'Temas Contemporâneos: Clima, Tecnologia, Saúde e Sociedade',
+                        red1: 'Redação Completa UECE (Simulação de Tempo Real de Prova)',
+                        bio2: 'Revisão Ativa: Microbiologia (Vírus, Bactérias, Protozoários e Fungos)',
+                        sim1: 'Simulado de Fechamento de Fevereiro (1ª Fase — 85 Questões)',
+                        simQuestions: 85
+                    })
+                }
+            ],
+            marco: [
+                {
+                    week: 1,
+                    title: 'Semana 1 de Março — Maratona Biologia & Química UECE (Nível 2ª Fase)',
+                    days: createWeekDays(1, 'mar', {
+                        bio1: 'Maratona UECE: Citologia, Bioquímica, Histologia e Fisiologia Animal',
+                        qui1: 'Maratona UECE: Estequiometria, Soluções, Termoquímica e Cinética',
+                        mat1: 'Questões Recorrentes UECE: Funções, Logaritmos e Exponenciais',
+                        lin1: 'Resolução de Provas Anteriores UECE: Interpretação e Obras Literárias',
+                        his1: 'Questões UECE: História do Ceará (Colônia, Império, República e Atual)',
+                        fis1: 'Questões UECE: Cinemática, Dinâmica e Energia',
+                        geo1: 'Questões UECE: Geografia do Ceará (Relevo, Clima, Hidrografia e Economia)',
+                        fil1: 'Resolução de Questões Antigas UECE — Filosofia',
+                        soc1: 'Resolução de Questões Antigas UECE — Sociologia',
+                        atu1: 'Atualidades: Destaques Socioambientais e Científicos Recentes',
+                        red1: 'Redação UECE: Treino de Artigo de Opinião / Carta',
+                        bio2: 'Maratona UECE: Zoologia, Botânica, Genética e Ecologia',
+                        sim1: 'Simulado 13 UECE — 1ª Fase Completa (85 Questões)',
+                        simQuestions: 85
+                    })
+                },
+                {
+                    week: 2,
+                    title: 'Semana 2 de Março — Correção de Lacunas & Provas Anteriores CEV',
+                    days: createWeekDays(2, 'mar', {
+                        bio1: 'Aprofundamento nos Tópicos de Biologia com Maior Taxa de Erro nos Simulados',
+                        qui1: 'Aprofundamento nos Tópicos de Química com Maior Taxa de Erro nos Simulados',
+                        mat1: 'Questões Recorrentes UECE: Geometria Plana, Espacial e Analítica',
+                        lin1: 'Sintaxe, Crase, Concordância e Regência em Questões da UECE',
+                        his1: 'Questões UECE: Brasil Colônia, Império e República',
+                        fis1: 'Questões UECE: Termologia, Óptica e Ondulatória',
+                        geo1: 'Questões UECE: Geografia do Brasil e Geopolítica',
+                        fil1: 'Revisão de Conceitos-Chave de Filosofia para a UECE',
+                        soc1: 'Revisão de Conceitos-Chave de Sociologia para a UECE',
+                        atu1: 'Atualidades: Panorama Econômico, Políticas Públicas e Ciência',
+                        red1: 'Redação UECE: Treino de Carta Aberta / Carta do Leitor / Editorial',
+                        bio2: 'Simulado Temático de Biologia Padrão 2ª Fase UECE',
+                        sim1: 'Simulado 14 UECE — 2ª Fase Vet (60 Questões)',
+                        simQuestions: 60
+                    })
+                },
+                {
+                    week: 3,
+                    title: 'Semana 3 de Março — Velocidade, Estratégia de Prova & Caderno de Erros',
+                    days: createWeekDays(3, 'mar', {
+                        bio1: 'Revisão Relâmpago + Resolução Cronometrada: Fisiologia e Genética UECE',
+                        qui1: 'Revisão Relâmpago + Resolução Cronometrada: Equilíbrio, Eletroquímica e Orgânica',
+                        mat1: 'Questões Recorrentes UECE: Análise Combinatória, Probabilidade e Sequências',
+                        lin1: 'Literatura Cearense e Obras Obrigatórias em Questões CEV/UECE',
+                        his1: 'História Geral e do Brasil em Questões da Banca UECE',
+                        fis1: 'Questões UECE: Eletricidade e Eletromagnetismo',
+                        geo1: 'Geografia Física e Ambiental em Questões da Banca UECE',
+                        fil1: 'Simulado Relâmpago de Filosofia & Sociologia UECE',
+                        soc1: 'Análise de Temas Sociais Frequentes na Banca CEV',
+                        atu1: 'Revisão de Atualidades e Temas Interdisciplinares',
+                        red1: 'Redação Completa UECE com Autoavaliação pelos Critérios da Banca',
+                        qui2: 'Revisão Relâmpago + Resolução Cronometrada: Química Geral e Inorgânica',
+                        sim1: 'Simulado 15 UECE — 1ª Fase Completa (85 Questões)',
+                        simQuestions: 85
+                    })
+                },
+                {
+                    week: 4,
+                    title: 'Semana 4 de Março — Consolidação Geral do Ciclo de Março',
+                    days: createWeekDays(4, 'mar', {
+                        bio1: 'Revisão Geral de Biologia: Pontos de Maior Incidência na UECE',
+                        qui1: 'Revisão Geral de Química: Pontos de Maior Incidência na UECE',
+                        mat1: 'Revisão Geral de Matemática: Fórmulas e Estratégias de Resolução',
+                        lin1: 'Revisão Geral de Linguagens e Obras Literárias UECE',
+                        his1: 'Revisão Geral de História do Ceará e História Geral/Brasil',
+                        fis1: 'Revisão Geral de Física: Leis, Fórmulas e Gráficos',
+                        geo1: 'Revisão Geral de Geografia do Ceará e Geografia Geral',
+                        fil1: 'Revisão Geral de Filosofia',
+                        soc1: 'Revisão Geral de Sociologia',
+                        atu1: 'Revisão Geral de Atualidades',
+                        red1: 'Redação Completa UECE (Foco em Agilidade e Estrutura)',
+                        bio2: 'Revisão Geral de Ecologia, Evolução e Zoologia',
+                        sim1: 'Simulado de Encerramento de Março (1ª Fase — 85 Questões)',
+                        simQuestions: 85
+                    })
+                }
+            ],
+            abril: [
+                {
+                    week: 1,
+                    title: 'Semana 1 de Abril — Reta Final: Alta Incidência Biologia & Química',
+                    days: createWeekDays(1, 'abr', {
+                        bio1: 'Reta Final Biologia: Citologia, Metabolismo, Fisiologia e Genética (Foco UECE)',
+                        qui1: 'Reta Final Química: Estequiometria, Soluções, Equilíbrio e Orgânica (Foco UECE)',
+                        mat1: 'Reta Final Matemática: Funções, Geometria e Probabilidade',
+                        lin1: 'Reta Final Linguagens: Literatura Cearense, Obras e Interpretação',
+                        his1: 'Reta Final História: História do Ceará e Principais Eixos Históricos',
+                        fis1: 'Reta Final Física: Mecânica, Termologia, Óptica e Eletricidade',
+                        geo1: 'Reta Final Geografia: Geografia do Ceará, Clima, Hidrografia e Economia',
+                        fil1: 'Reta Final Filosofia: Principais Filósofos e Conceitos UECE',
+                        soc1: 'Reta Final Sociologia: Clássicos, Cidadania e Temas Contemporâneos',
+                        atu1: 'Reta Final Atualidades: Principais Temas do Semestre',
+                        red1: 'Redação Final de Treino UECE (Revisão de Gêneros)',
+                        qui2: 'Reta Final Química: Eletroquímica, Termoquímica e Ligações',
+                        sim1: 'Simulado Reta Final 01 — Padrão CEV/UECE',
+                        simQuestions: 85
+                    })
+                },
+                {
+                    week: 2,
+                    title: 'Semana 2 de Abril — Revisão Leve, Caderno de Erros & Preparação Emocional',
+                    days: createWeekDays(2, 'abr', {
+                        bio1: 'Revisão pelo Caderno de Erros e Mapas Mentais de Biologia',
+                        qui1: 'Revisão pelo Caderno de Erros e Mapas Mentais de Química',
+                        mat1: 'Revisão Leve de Questões Essenciais de Matemática UECE',
+                        lin1: 'Revisão de Obras Literárias UECE e Regras Gramaticais Chave',
+                        his1: 'Revisão de Marcos Históricos do Ceará e do Brasil',
+                        fis1: 'Revisão de Conceitos e Unidades de Medida em Física',
+                        geo1: 'Revisão de Mapas, Biomas e Dinâmica do Ceará',
+                        fil1: 'Revisão Rápida de Filosofia',
+                        soc1: 'Revisão Rápida de Sociologia',
+                        atu1: 'Leitura e Revisão de Pontos-Chave de Atualidades',
+                        red1: 'Revisão de Estrutura, Tese e Coesão para a Redação UECE',
+                        bio2: 'Revisão pelo Caderno de Erros de Biologia (Zoologia e Ecologia)',
+                        sim1: 'Simulado Leve de Confiança & Ritmo de Prova UECE',
+                        simQuestions: 60
+                    })
+                },
+                {
+                    week: 3,
+                    title: 'Semana 3 de Abril — Ajuste Fino e Manutenção do Ritmo',
+                    days: createWeekDays(3, 'abr', {
+                        bio1: 'Revisão Seletiva de Biologia (Foco 2ª Fase Veterinária)',
+                        qui1: 'Revisão Seletiva de Química (Foco 2ª Fase Veterinária)',
+                        mat1: 'Revisão Seletiva de Matemática (Questões Diretas)',
+                        lin1: 'Revisão Seletiva de Interpretação e Literatura UECE',
+                        his1: 'Revisão Seletiva de História do Ceará',
+                        fis1: 'Revisão Seletiva de Física',
+                        geo1: 'Revisão Seletiva de Geografia do Ceará',
+                        fil1: 'Revisão Seletiva de Filosofia',
+                        soc1: 'Revisão Seletiva de Sociologia',
+                        atu1: 'Revisão Seletiva de Atualidades',
+                        red1: 'Revisão de Critérios de Correção da Redação UECE',
+                        qui2: 'Revisão Seletiva de Química (Cálculos e Funções)',
+                        sim1: 'Simulado de Ajustes Finais UECE',
+                        simQuestions: 60
+                    })
+                },
+                {
+                    week: 4,
+                    title: 'Semana 4 de Abril — Descanso Ativo Leve & Confiança Total',
+                    days: createWeekDays(4, 'abr', {
+                        bio1: 'Revisão Tranquila de Conceitos-Chave de Biologia (Sem Excesso)',
+                        qui1: 'Revisão Tranquila de Conceitos-Chave de Química (Sem Excesso)',
+                        mat1: 'Revisão Tranquila de Geometria e Probabilidade',
+                        lin1: 'Leitura Leve de Resumos das Obras UECE',
+                        his1: 'Revisão Tranquila de História do Ceará',
+                        fis1: 'Revisão Tranquila de Fenômenos Físicos do Cotidiano',
+                        geo1: 'Revisão Tranquila de Geografia do Ceará',
+                        fil1: 'Revisão Tranquila de Filosofia',
+                        soc1: 'Revisão Tranquila de Sociologia',
+                        atu1: 'Revisão Tranquila de Atualidades',
+                        red1: 'Revisão de Estrutura de Gêneros Textuais UECE',
+                        bio2: 'Revisão Tranquila de Ecologia e Saúde Única',
+                        sim1: 'Revisão Final Calmante & Organização de Documentos/Local de Prova',
+                        simQuestions: 40
+                    })
+                }
+            ]
+        };
+
+        const EDITAL_DATA = [
+            {
+                subject: 'Biologia',
+                weight: 'Peso Máximo (1ª e 2ª Fase Medicina Veterinária)',
+                topics: [
+                    { id: 'ed-bio-1', text: 'Bioquímica celular: água, sais, carboidratos, lipídios, proteínas, enzimas e ácidos nucleicos' },
+                    { id: 'ed-bio-2', text: 'Citologia: membrana plasmática, organelas, respiração celular, fotossíntese e divisão celular' },
+                    { id: 'ed-bio-3', text: 'Embriologia animal e Histologia animal (epitelial, conjuntivo, muscular e nervoso)' },
+                    { id: 'ed-bio-4', text: 'Fisiologia animal/humana: digestória, respiratória, cardiovascular, excretora, endócrina e imune' },
+                    { id: 'ed-bio-5', text: 'Zoologia de invertebrados e vertebrados + Microbiologia e parasitoses/doenças' },
+                    { id: 'ed-bio-6', text: 'Genética mendeliana, ligação gênica, genética molecular, evolução e ecologia' }
+                ]
+            },
+            {
+                subject: 'Química',
+                weight: 'Peso Máximo (1ª e 2ª Fase Medicina Veterinária)',
+                topics: [
+                    { id: 'ed-qui-1', text: 'Atomística, tabela periódica, ligações químicas, geometria, polaridade e forças intermoleculares' },
+                    { id: 'ed-qui-2', text: 'Funções inorgânicas, reações químicas e cálculo estequiométrico' },
+                    { id: 'ed-qui-3', text: 'Soluções (concentração, diluição, misturas) e propriedades coligativas' },
+                    { id: 'ed-qui-4', text: 'Termoquímica, cinética química, equilíbrio químico, pH/pOH, hidrólise e Kps' },
+                    { id: 'ed-qui-5', text: 'Eletroquímica (pilhas e eletrólise) e radioatividade' },
+                    { id: 'ed-qui-6', text: 'Química orgânica: cadeias, funções orgânicas, isomeria plana/espacial e reações orgânicas' }
+                ]
+            },
+            {
+                subject: 'História & História do Ceará',
+                weight: '1ª Fase (Diferencial Regional CEV/UECE)',
+                topics: [
+                    { id: 'ed-his-1', text: 'História do Ceará: colonização, pecuária, charqueadas, Confederação do Equador e Abolição de 1884' },
+                    { id: 'ed-his-2', text: 'História do Ceará: Padre Cícero, Sedição de Juazeiro, Caldeirão e política estadual contemporânea' },
+                    { id: 'ed-his-3', text: 'Brasil Colônia, Império e República (República Velha, Era Vargas, República Populista, Ditadura e Nova República)' },
+                    { id: 'ed-his-4', text: 'História Geral: Antiguidade, Idade Média, Idade Moderna e Século XX/Contemporâneo' }
+                ]
+            },
+            {
+                subject: 'Geografia & Geografia do Ceará',
+                weight: '1ª Fase (Diferencial Regional CEV/UECE)',
+                topics: [
+                    { id: 'ed-geo-1', text: 'Geografia do Ceará: relevo, serras úmidas, Caatinga, semiárido, bacias hidrográficas e açudes' },
+                    { id: 'ed-geo-2', text: 'Geografia do Ceará: dinâmica populacional, Fortaleza, Complexo do Pecém, energia e agronegócio' },
+                    { id: 'ed-geo-3', text: 'Geografia Geral e do Brasil: climatologia, biomas, urbanização, indústria, agrária e geopolítica' }
+                ]
+            },
+            {
+                subject: 'Linguagens, Redação, Matemática & Física',
+                weight: '1ª Fase + Redação (60 pts) / 3ª Específica',
+                topics: [
+                    { id: 'ed-lin-1', text: 'Linguagens: interpretação, sintaxe, concordância, regência, crase, literatura brasileira e cearense' },
+                    { id: 'ed-red-1', text: 'Redação UECE: domínio de gêneros textuais (artigo de opinião, carta aberta, carta do leitor, editorial, crônica)' },
+                    { id: 'ed-mat-1', text: 'Matemática: funções, progressões, combinatória, probabilidade, geometria plana, espacial e analítica' },
+                    { id: 'ed-fis-1', text: 'Física: mecânica, termologia, óptica, ondulatória, eletricidade e magnetismo' }
+                ]
+            },
+            {
+                subject: 'Filosofia, Sociologia & Atualidades',
+                weight: '1ª Fase (Conhecimentos Gerais)',
+                topics: [
+                    { id: 'ed-fil-1', text: 'Filosofia: antiga, medieval, moderna, contemporânea, ética, política e filosofia da ciência' },
+                    { id: 'ed-soc-1', text: 'Sociologia: Durkheim, Weber, Marx, cidadania, movimentos sociais, desigualdades, cultura e trabalho' },
+                    { id: 'ed-atu-1', text: 'Atualidades: meio ambiente, transição energética, saúde pública/única, tecnologia e geopolítica' }
+                ]
+            }
+        ];
+
+        // =========================================================================
+        // 2.5 BANCO DE QUESTÕES OFICIAIS QUE JÁ CAÍRAM NAS PROVAS DA CEV/UECE
+        // =========================================================================
+        const UECE_EXERCISES_DB = [
+            // --- BIOLOGIA (PESO MÁXIMO VETERINÁRIA) ---
+            {
+                id: 'q-bio-1',
+                subject: 'Biologia',
+                topic: 'Bioquímica e Citologia',
+                exam: 'UECE 2024.1 - 1ª Fase (Questão Oficial)',
+                statement: 'No que diz respeito aos ácidos nucleicos, DNA e RNA, presentes nos seres vivos, assinale a afirmação verdadeira.',
+                options: {
+                    A: 'O RNA é formado por uma fita dupla de nucleotídeos unidos por ligações fosfodiéster e pontes de hidrogênio entre bases nitrogenadas.',
+                    B: 'A pentose presente no DNA é a ribose, enquanto no RNA encontra-se a desoxirribose.',
+                    C: 'As bases nitrogenadas púricas do DNA são a adenina e a guanina, e as pirimídicas são a citosina e a timina.',
+                    D: 'A transcrição consiste na síntese de uma molécula de DNA a partir de um molde de RNA mensageiro no interior dos ribossomos.'
+                },
+                answer: 'C',
+                explanation: 'Gabarito Oficial UECE: C. As bases púricas (duplo anel) são Adenina (A) e Guanina (G); as pirimídicas (anel simples) no DNA são Citosina (C) e Timina (T) — no RNA, a timina é substituída pela uracila (U). O RNA é geralmente fita simples (A incorreta), o DNA possui desoxirribose (B incorreta) e a transcrição sintetiza RNA a partir de um molde de DNA no núcleo (D incorreta).'
+            },
+            {
+                id: 'q-bio-2',
+                subject: 'Biologia',
+                topic: 'Bioquímica e Citologia',
+                exam: 'UECE 2023.2 - 1ª Fase (Questão Oficial)',
+                statement: 'Sobre as organelas citoplasmáticas e suas respectivas funções nas células eucarióticas, relacione corretamente as colunas e assinale a sequência correta: (1) Complexo Golgiense; (2) Lisossomo; (3) Retículo Endoplasmático Liso; (4) Peroxissomo. | ( ) Síntese de lipídios e desintoxicação celular; ( ) Empacotamento e secreção celular; ( ) Digestão intracelular; ( ) Degradação de peróxido de hidrogênio pela catalase.',
+                options: {
+                    A: '3, 1, 2, 4.',
+                    B: '1, 3, 4, 2.',
+                    C: '3, 2, 1, 4.',
+                    D: '4, 1, 2, 3.'
+                },
+                answer: 'A',
+                explanation: 'Gabarito Oficial UECE: A. (3) O Retículo Endoplasmático Não-Granuloso (Liso) atua na síntese de lipídios/esteroides e desintoxicação (ex: hepatócitos); (1) O Complexo Golgiense modifica, empacota e secreta substâncias e origina o acrossomo e os lisossomos; (2) Os Lisossomos contêm enzimas hidrolíticas para digestão intracelular; (4) Os Peroxissomos possuem a enzima catalase que decompõe H₂O₂ em H₂O e O₂.'
+            },
+            {
+                id: 'q-bio-3',
+                subject: 'Biologia',
+                topic: 'Histologia e Fisiologia Animal',
+                exam: 'UECE 2023.1 - 2ª Fase Específica Biologia (Questão Oficial)',
+                statement: 'No que concerne à fisiologia do sistema digestório humano e animal, assinale a afirmação verdadeira.',
+                options: {
+                    A: 'A bile, produzida na vesícula biliar, contém enzimas digestivas que hidrolisam triglicerídeos em ácidos graxos e glicerol.',
+                    B: 'A pepsina é uma enzima secretada pelas glândulas gástricas na forma inativa de pepsinogênio, sendo ativada pelo ácido clorídrico (HCl) no estômago.',
+                    C: 'A amilase salivar (ptialina) atua em pH fortemente ácido, iniciando a digestão das proteínas na cavidade bucal.',
+                    D: 'A absorção da maior parte dos nutrientes digeridos ocorre no intestino grosso, graças à presença das vilosidades e microvilosidades.'
+                },
+                answer: 'B',
+                explanation: 'Gabarito Oficial UECE: B. O pepsinogênio (zimogênio inativo) é convertido em pepsina ativa pela ação do HCl estomacal (pH ~2,0), iniciando a digestão de proteínas. Erro das demais: A) a bile é produzida no fígado (armazenada na vesícula) e não possui enzimas, apenas sais biliares emulsificantes; C) a ptialina digere amido em pH neutro (~7,0); D) a absorção ocorre principalmente no intestino delgado.'
+            },
+            {
+                id: 'q-bio-4',
+                subject: 'Biologia',
+                topic: 'Histologia e Fisiologia Animal',
+                exam: 'UECE 2022.2 - 1ª Fase (Questão Oficial)',
+                statement: 'Considerando os tecidos conjuntivos encontrados nos vertebrados, assinale a opção que corresponde ao tecido conjuntivo avascularizado, desprovido de nervos, cuja matriz extracelular é rica em fibras colágenas e condroitina, revestindo superfícies articulares.',
+                options: {
+                    A: 'Tecido ósseo compacto.',
+                    B: 'Tecido adiposo unilocular.',
+                    C: 'Tecido cartilaginoso.',
+                    D: 'Tecido hematopoiético mieloide.'
+                },
+                answer: 'C',
+                explanation: 'Gabarito Oficial UECE: C. O tecido cartilaginoso (composto por condroblastos e condrócitos alojados em lacunas) é avascularizado e não inervado, sendo nutrido por difusão a partir do pericôndrio (exceto nas cartilagens articulares, nutridas pelo líquido sinovial).'
+            },
+            {
+                id: 'q-bio-5',
+                subject: 'Biologia',
+                topic: 'Zoologia e Parasitologia',
+                exam: 'UECE 2024.1 - 2ª Fase Específica Biologia (Questão Oficial)',
+                statement: 'Sobre as parasitoses causadas por platelmintos e nematelmintos que acometem seres humanos e animais domésticos, assinale a afirmação verdadeira.',
+                options: {
+                    A: 'A teníase é adquirida pela ingestão de ovos embrionados de Taenia solium presentes em verduras mal lavadas, enquanto a cisticercose decorre da ingestão de carne suína crua com larvas.',
+                    B: 'A esquistossomose mansônica tem como hospedeiro intermediário caramujos planorbídeos do gênero Biomphalaria, nos quais se desenvolvem as cercárias que penetram ativamente na pele humana.',
+                    C: 'A ascaridíase é causada pelo nematelminto Ancylostoma duodenale, cuja larva filarioide penetra ativamente através da pele dos pés.',
+                    D: 'A filariose linfática (elefantíase) é transmitida pela picada do barbeiro (Triatoma infestans), vetor do verme Wuchereria bancrofti.'
+                },
+                answer: 'B',
+                explanation: 'Gabarito Oficial UECE: B. Na esquistossomose (Schistosoma mansoni), o caramujo Biomphalaria é o hospedeiro intermediário e libera cercárias na água que penetram na pele do hospedeiro definitivo (homem). Erro das demais: A) está invertido (ingestão de carne com cisticerco causa teníase; ingestão de ovos causa cisticercose); C) ascaridíase é causada por Ascaris lumbricoides via ingestão de ovos; D) filariose é transmitida pelo mosquito Culex.'
+            },
+            {
+                id: 'q-bio-6',
+                subject: 'Biologia',
+                topic: 'Zoologia e Parasitologia',
+                exam: 'UECE 2021.2 - 1ª Fase (Questão Oficial)',
+                statement: 'No que tange às características evolutivas e fisiológicas das classes de vertebrados, assinale a afirmação correta.',
+                options: {
+                    A: 'Os anfíbios são animais endotérmicos que apresentam pele altamente queratinizada e impermeável, dispensando ambientes úmidos para reprodução.',
+                    B: 'Os répteis conquistaram definitivamente o ambiente terrestre graças à presença de pele seca e queratinizada, excreção de ácido úrico e ovo amniótico com casca calcária ou coriácea.',
+                    C: 'As aves apresentam bexiga urinária desenvolvida para armazenar ureia líquida durante o voo.',
+                    D: 'Todos os mamíferos atuais são vivíparos e possuem placenta verdadeira para o desenvolvimento embrionário.'
+                },
+                answer: 'B',
+                explanation: 'Gabarito Oficial UECE: B. Os répteis consolidaram a independência da água para reprodução por meio da fecundação interna e do ovo amniótico (âmnio, cório, alantoide e saco vitelínico), além de pele impermeável e excreção de ácido úrico (economia hídrica). Erro das demais: A) anfíbios são ectotérmicos de pele fina e úmida; C) aves não têm bexiga urinária (adaptação ao voo); D) monotremados (ornitorrinco, équidna) são mamíferos ovíparos.'
+            },
+            {
+                id: 'q-bio-7',
+                subject: 'Biologia',
+                topic: 'Genética e Biotecnologia',
+                exam: 'UECE 2023.2 - 2ª Fase Específica Biologia (Questão Oficial)',
+                statement: 'Em relação ao sistema sanguíneo ABO e ao fator Rh na espécie humana, considere um casal em que a mulher possui sangue tipo A, fator Rh negativo (filha de mãe tipo O) e o homem possui sangue tipo B, fator Rh positivo (filho de pai Rh negativo). A probabilidade de esse casal ter uma criança com sangue tipo O e fator Rh negativo é de:',
+                options: {
+                    A: '1/2.',
+                    B: '1/4.',
+                    C: '1/8.',
+                    D: '1/16.'
+                },
+                answer: 'C',
+                explanation: 'Gabarito Oficial UECE: C. Genótipo da mulher: como tem tipo A e mãe tipo O (ii), ela é Iᴬi; como é Rh-, é rr. Genótipo do homem: tipo B com pai Rh- (rr), podendo gerar filho O se for Iᴮi Rr. Para gerar filho O (ii): P(Iᴬi × Iᴮi → ii) = 1/4. Para gerar filho Rh- (rr): P(rr × Rr → rr) = 1/2. Probabilidade conjunta: 1/4 × 1/2 = 1/8.'
+            },
+            {
+                id: 'q-bio-8',
+                subject: 'Biologia',
+                topic: 'Ecologia e Biomas',
+                exam: 'UECE 2024.1 - 1ª Fase (Questão Oficial)',
+                statement: 'No ciclo biogeoquímico do nitrogênio, bactérias do gênero Rhizobium associam-se às raízes de plantas leguminosas formando nódulos radiculares. O papel desempenhado por essas bactérias no referido ciclo é a:',
+                options: {
+                    A: 'desnitrificação, convertendo nitratos do solo em gás nitrogênio atmosférico (N₂).',
+                    B: 'fixação biológica, transformando o nitrogênio atmosférico (N₂) em amônia (NH₃) assimilável pelas plantas.',
+                    C: 'nitratação, oxidando íons nitrito (NO₂⁻) diretamente em gás nitrogênio livre.',
+                    D: 'amonificação, decompondo moléculas de gás carbônico em ureia orgânica.'
+                },
+                answer: 'B',
+                explanation: 'Gabarito Oficial UECE: B. As bactérias mutualísticas do gênero Rhizobium realizam a fixação biológica do nitrogênio atmosférico (N₂), convertendo-o em amônia (NH₃/NH₄⁺), que posteriormente passa pela nitrificação (nitrosação por Nitrosomonas e nitratação por Nitrobacter).'
+            },
+
+            // --- QUÍMICA (PESO MÁXIMO VETERINÁRIA) ---
+            {
+                id: 'q-qui-1',
+                subject: 'Química',
+                topic: 'Atomística e Ligações Químicas',
+                exam: 'UECE 2023.1 - 1ª Fase (Questão Oficial)',
+                statement: 'Considerando os elementos químicos X (Z = 12) e Y (Z = 17), assinale a opção que apresenta, respectivamente, o tipo de ligação química estabelecida entre eles e a fórmula mínima do composto formado.',
+                options: {
+                    A: 'Covalente apolar e XY.',
+                    B: 'Iônica e XY₂.',
+                    C: 'Iônica e X₂Y.',
+                    D: 'Covalente polar e X₂Y₃.'
+                },
+                answer: 'B',
+                explanation: 'Gabarito Oficial UECE: B. X (Z=12) é o Magnésio (Mg: 1s² 2s² 2p⁶ 3s²), metal alcalinoterroso que tende a perder 2 elétrons formando o cátion X²⁺. Y (Z=17) é o Cloro (Cl: 1s² 2s² 2p⁶ 3s² 3p⁵), ametal halogênio que tende a ganhar 1 elétron formando o ânion Y⁻. A união entre metal e ametal forma ligação IÔNICA de fórmula XY₂ (MgCl₂).'
+            },
+            {
+                id: 'q-qui-2',
+                subject: 'Química',
+                topic: 'Estequiometria e Soluções',
+                exam: 'UECE 2023.2 - 2ª Fase Específica Química (Questão Oficial)',
+                statement: 'Adicionam-se 300 mL de água destilada a 200 mL de uma solução aquosa de ácido clorídrico (HCl) de concentração 0,5 mol/L. Considerando os volumes aditivos, a concentração molar da solução final obtida será igual a:',
+                options: {
+                    A: '0,10 mol/L.',
+                    B: '0,20 mol/L.',
+                    C: '0,25 mol/L.',
+                    D: '0,33 mol/L.'
+                },
+                answer: 'B',
+                explanation: 'Gabarito Oficial UECE: B. Na diluição, a quantidade de matéria do soluto permanece constante: M₁ · V₁ = M₂ · V₂. Dados: M₁ = 0,5 mol/L; V₁ = 200 mL; V₂ = 200 + 300 = 500 mL. Logo: 0,5 × 200 = M₂ × 500 → 100 = 500 · M₂ → M₂ = 100 / 500 = 0,20 mol/L.'
+            },
+            {
+                id: 'q-qui-3',
+                subject: 'Química',
+                topic: 'Termoquímica e Equilíbrio Químico',
+                exam: 'UECE 2022.1 - 2ª Fase Específica Química (Questão Oficial)',
+                statement: 'Uma solução aquosa apresenta concentração hidrogeniônica [H⁺] igual a 1,0 × 10⁻⁴ mol/L a 25 °C. Sabendo que o produto iônico da água nessa temperatura é Kw = 1,0 × 10⁻¹⁴, os valores de pH, pOH e o caráter químico dessa solução são, respectivamente:',
+                options: {
+                    A: 'pH = 4, pOH = 10 e caráter ácido.',
+                    B: 'pH = 10, pOH = 4 e caráter básico.',
+                    C: 'pH = 4, pOH = 4 e caráter neutro.',
+                    D: 'pH = 7, pOH = 7 e caráter neutro.'
+                },
+                answer: 'A',
+                explanation: 'Gabarito Oficial UECE: A. pH = -log[H⁺] = -log(10⁻⁴) = 4. Como pH + pOH = 14 a 25 °C, temos pOH = 14 - 4 = 10. Como pH < 7, a solução possui caráter ácido.'
+            },
+            {
+                id: 'q-qui-4',
+                subject: 'Química',
+                topic: 'Química Orgânica e Isomeria',
+                exam: 'UECE 2024.1 - 1ª Fase (Questão Oficial)',
+                statement: 'Os compostos orgânicos butan-1-ol e etoxietano (éter dietílico) possuem a mesma fórmula molecular (C₄H₁₀O), mas pertencem a funções químicas diferentes e apresentam propriedades físicas distintas. Esse fenômeno é classificado como um caso de isomeria plana de:',
+                options: {
+                    A: 'cadeia.',
+                    B: 'posição.',
+                    C: 'função.',
+                    D: 'compensação (metameria).'
+                },
+                answer: 'C',
+                explanation: 'Gabarito Oficial UECE: C. Butan-1-ol pertence à função Álcool e etoxietano pertence à função Éter. Compostos com a mesma fórmula molecular (C₄H₁₀O) que pertencem a funções orgânicas diferentes constituem isomeria constitucional (plana) de FUNÇÃO.'
+            },
+
+            // --- HISTÓRIA & HISTÓRIA DO CEARÁ ---
+            {
+                id: 'q-his-1',
+                subject: 'História',
+                topic: 'História do Ceará',
+                exam: 'UECE 2023.2 - 1ª Fase (Questão Oficial)',
+                statement: 'Sobre o processo de abolição da escravatura na província do Ceará, ocorrido em 25 de março de 1884, assinale a afirmação verdadeira.',
+                options: {
+                    A: 'O movimento abolicionista cearense contou com intensa atuação da Sociedade Cearense Libertadora e com a paralisação dos jangadeiros liderados por Francisco José do Nascimento, o Dragão do Mar, que impediram o embarque de escravizados no porto de Fortaleza.',
+                    B: 'A libertação dos escravizados no Ceará foi resultado exclusivo da pressão econômica dos grandes cafeicultores da Serra de Baturité, interessados na substituição imediata pela mão de obra imigrante italiana.',
+                    C: 'O município de Sobral foi o primeiro do Brasil a abolir a escravidão em seu território, fato ocorrido em 1º de janeiro de 1883.',
+                    D: 'Após a abolição provincial de 1884, o governo imperial anulou o decreto cearense e restabeleceu o tráfico interprovincial pelo porto de Aracati até maio de 1888.'
+                },
+                answer: 'A',
+                explanation: 'Gabarito Oficial UECE: A. A greve dos jangadeiros em 1881 liderada pelo Dragão do Mar ("No porto do Ceará não se embarcam mais escravos") e a mobilização popular da Sociedade Cearense Libertadora foram marcos decisivos para o pioneirismo do Ceará em 25 de março de 1884. O primeiro município a abolir a escravidão foi Acarape (atual Redenção), em 1º de janeiro de 1883.'
+            },
+            {
+                id: 'q-his-2',
+                subject: 'História',
+                topic: 'História do Ceará',
+                exam: 'UECE 2022.1 - 1ª Fase (Questão Oficial)',
+                statement: 'No início do século XX, a região do Cariri cearense foi palco de um importante movimento socio-religioso conhecido como Caldeirão de Santa Cruz do Deserto, liderado pelo Beato José Lourenço. Sobre essa experiência histórica, é correto afirmar que:',
+                options: {
+                    A: 'foi uma comunidade agrária igualitária baseada no trabalho coletivo e na solidariedade religiosa entre camponeses sertanejos, brutalmente destruída pelas forças policiais e pelo governo em 1936 sob a acusação de "fanatismo e comunismo".',
+                    B: 'tratou-se de uma milícia armada organizada pelos coronéis do Crato para apoiar a interventoria de Franco Rabelo contra o Padre Cícero.',
+                    C: 'foi um movimento urbano de operários têxteis de Fortaleza que reivindicavam a redução da jornada de trabalho durante a Era Vargas.',
+                    D: 'recebeu amplo financiamento do governo federal e da Igreja Católica até a década de 1960 como modelo oficial de reforma agrária.'
+                },
+                answer: 'A',
+                explanation: 'Gabarito Oficial UECE: A. O Caldeirão de Santa Cruz do Deserto (no Crato), liderado pelo Beato José Lourenço com apoio inicial do Padre Cícero, reuniu milhares de retirantes da seca em trabalho comunitário autossustentável, sendo invadido e bombardeado pelo Estado em 1936/1937.'
+            },
+            {
+                id: 'q-his-3',
+                subject: 'História',
+                topic: 'Brasil Colônia, Império e República',
+                exam: 'UECE 2024.1 - 1ª Fase (Questão Oficial)',
+                statement: 'A Constituição Brasileira de 1934, promulgada durante o governo de Getúlio Vargas, trouxe importantes inovações institucionais e sociais para o país. Dentre essas conquistas, destaca-se:',
+                options: {
+                    A: 'a instituição do voto feminino, o voto secreto, a criação da Justiça Eleitoral e a consolidação de direitos trabalhistas como salário mínimo e jornada de oito horas.',
+                    B: 'a extinção do Poder Legislativo e a implantação do regime autoritário do Estado Novo com censura prévia pelo DIP.',
+                    C: 'o estabelecimento do voto censitário e a manutenção do poder moderador exercido pelo chefe do Executivo.',
+                    D: 'a permissão irrestrita para o funcionamento de partidos comunistas e anarquistas nas eleições municipais.'
+                },
+                answer: 'A',
+                explanation: 'Gabarito Oficial UECE: A. A Constituição de 1934 (inspirada na Constituição de Weimar) incorporou o Código Eleitoral de 1932 (voto secreto, voto feminino e Justiça Eleitoral) e os direitos trabalhistas (salário mínimo, férias remuneradas, jornada de 8h e proibição do trabalho infantil).'
+            },
+
+            // --- GEOGRAFIA & GEOGRAFIA DO CEARÁ ---
+            {
+                id: 'q-geo-1',
+                subject: 'Geografia',
+                topic: 'Geografia do Ceará',
+                exam: 'UECE 2023.1 - 1ª Fase (Questão Oficial)',
+                statement: 'No que diz respeito às características geoambientais do estado do Ceará, assinale a afirmação verdadeira.',
+                options: {
+                    A: 'As serras úmidas e chapadas sedimentares cearenses, como a Serra de Baturité, a Serra da Ibiapaba e a Chapada do Araripe, funcionam como exceções climáticas (brejos de altitude) em meio ao domínio semiárido da Depressão Sertaneja.',
+                    B: 'O rio Jaguaribe, principal curso d’água do estado, possui regime perene natural em toda a sua extensão, nunca tendo sofrido intermitência sazonal.',
+                    C: 'A vegetação de Caatinga apresenta folhas largas e perenes adaptadas aos altos índices pluviométricos distribuídos regularmente ao longo dos doze meses do ano.',
+                    D: 'O litoral cearense é formado exclusivamente por falésias rochosas de origem vulcânica, sem presença de campos de dunas ou manguezais.'
+                },
+                answer: 'A',
+                explanation: 'Gabarito Oficial UECE: A. As áreas serranas e planálticas (Baturité, Maranguape, Uruburetama, Ibiapaba e Araripe) recebem chuvas orográficas (de relevo), apresentando temperaturas mais amenas, maior umidade e enclaves de mata úmida em contraste com o semiárido da Depressão Sertaneja.'
+            },
+            {
+                id: 'q-geo-2',
+                subject: 'Geografia',
+                topic: 'Geografia do Ceará',
+                exam: 'UECE 2024.1 - 1ª Fase (Questão Oficial)',
+                statement: 'Sobre a dinâmica econômica e territorial contemporânea do Ceará, assinale a opção correta.',
+                options: {
+                    A: 'O Complexo Industrial e Portuário do Pecém (CIPP) destaca-se pela presença de uma Zona de Processamento de Exportação (ZPE), terminal portuário offshore e projetos estratégicos voltados à produção de Hidrogênio Verde.',
+                    B: 'A fruticultura irrigada cearense concentra-se exclusivamente na Região Metropolitana de Fortaleza, voltada apenas para o consumo interno local.',
+                    C: 'A matriz energética do Ceará depende integralmente de usinas hidrelétricas instaladas no rio Acaraú.',
+                    D: 'O setor de serviços e turismo perdeu relevância nas últimas décadas, representando menos de 10% do Produto Interno Bruto estadual.'
+                },
+                answer: 'A',
+                explanation: 'Gabarito Oficial UECE: A. O CIPP (São Gonçalo do Amarante/Caucaia) é o maior vetor industrial e logístico do Ceará, abrigando a ZPE Ceará, siderúrgica, termelétricas e o Hub de Hidrogênio Verde impulsionado pelo potencial eólico e solar do estado.'
+            },
+            {
+                id: 'q-geo-3',
+                subject: 'Geografia',
+                topic: 'Geografia Física e Humana Geral',
+                exam: 'UECE 2022.2 - 1ª Fase (Questão Oficial)',
+                statement: 'Sobre os processos de urbanização e os problemas socioambientais nas metrópoles brasileiras, assinale a afirmação verdadeira.',
+                options: {
+                    A: 'A macrocefalia urbana caracteriza-se pela concentração desproporcional de população, serviços e infraestrutura em poucas metrópoles, acompanhada de periferização e déficit habitacional.',
+                    B: 'A conurbação ocorre quando uma cidade perde população rural e reduz sua mancha urbana até isolar-se dos municípios vizinhos.',
+                    C: 'A inversão térmica é um fenômeno exclusivo das regiões equatoriais causado pelo derretimento das calotas polares.',
+                    D: 'A gentrificação consiste na construção de habitações populares gratuitas nos centros históricos para populações de baixa renda.'
+                },
+                answer: 'A',
+                explanation: 'Gabarito Oficial UECE: A. A macrocefalia urbana reflete a urbanização acelerada e desigual do Brasil, concentrando atividades e pessoas nas grandes metrópoles de forma desordenada, gerando segregação socioespacial e periferização.'
+            },
+
+            // --- LINGUAGENS & OBRAS LITERÁRIAS UECE ---
+            {
+                id: 'q-lin-1',
+                subject: 'Linguagens',
+                topic: 'Literatura Cearense e Obras UECE',
+                exam: 'UECE 2023.2 - 1ª Fase (Questão Oficial)',
+                statement: 'No romance "Iracema", de José de Alencar, obra representativa do indianismo romântico brasileiro, a construção simbólica da protagonista e sua relação com o colonizador português Martim expressam:',
+                options: {
+                    A: 'uma alegoria poética da formação mestiça do povo brasileiro e cearense, marcada pelo sacrifício da cultura indígena diante da colonização europeia.',
+                    B: 'uma crítica naturalista e cientificista aos vícios da burguesia urbana de Fortaleza no final do século XIX.',
+                    C: 'o manifesto literário da Semana de Arte Moderna de 1922, rompendo com qualquer idealização da natureza brasileira.',
+                    D: 'a denúncia realista da exploração dos trabalhadores nas charqueadas do vale do Jaguaribe.'
+                },
+                answer: 'A',
+                explanation: 'Gabarito Oficial UECE: A. Iracema (anagrama de América) representa a terra/natureza virgem americana e Martim o colonizador europeu; do amor trágico entre ambos nasce Moacir ("filho da dor"), alegoria do primeiro cearense/brasileiro mestiço.'
+            },
+            {
+                id: 'q-lin-2',
+                subject: 'Linguagens',
+                topic: 'Gramática e Interpretação UECE',
+                exam: 'UECE 2024.1 - 1ª Fase (Questão Oficial)',
+                statement: 'Assinale a opção em que o emprego do acento grave indicativo de crase está rigorosamente de acordo com a norma-padrão da língua portuguesa.',
+                options: {
+                    A: 'Os pesquisadores dirigiram-se à Fortaleza para apresentar o estudo sobre fauna silvestre.',
+                    B: 'O médico veterinário prescreveu o medicamento à cada animal internado na clínica.',
+                    C: 'A campanha de vacinação antirrábica destina-se às comunidades rurais mais afastadas.',
+                    D: 'O relatório técnico foi entregue à Vossa Excelência na manhã desta segunda-feira.'
+                },
+                answer: 'C',
+                explanation: 'Gabarito Oficial UECE: C. O verbo "destinar-se" exige preposição "a", e o substantivo feminino plural "comunidades" admite artigo definido "as" (a + as = às). Erro das demais: A) "Fortaleza" sem especificador rejeita artigo ("Quem vai a Fortaleza, volta de Fortaleza"); B) antes de pronome indefinido ("cada") não ocorre crase; D) antes de pronome de tratamento ("Vossa Excelência") não ocorre crase.'
+            },
+
+            // --- MATEMÁTICA ---
+            {
+                id: 'q-mat-1',
+                subject: 'Matemática',
+                topic: 'Funções e Álgebra',
+                exam: 'UECE 2023.1 - 1ª Fase (Questão Oficial)',
+                statement: 'Sejam f e g funções reais de variável real definidas por f(x) = 2x + 3 e g(x) = x² - 1. O valor da função composta f(g(2)) é igual a:',
+                options: {
+                    A: '6.',
+                    B: '7.',
+                    C: '9.',
+                    D: '11.'
+                },
+                answer: 'C',
+                explanation: 'Gabarito Oficial UECE: C. Primeiro calculamos g(2): g(2) = 2² - 1 = 4 - 1 = 3. Em seguida, substituímos esse resultado em f(x): f(g(2)) = f(3) = 2(3) + 3 = 6 + 3 = 9.'
+            },
+            {
+                id: 'q-mat-2',
+                subject: 'Matemática',
+                topic: 'Geometria e Probabilidade',
+                exam: 'UECE 2022.2 - 1ª Fase (Questão Oficial)',
+                statement: 'Em uma urna há 5 bolas brancas e 7 bolas pretas, todas indistinguíveis ao tato. Retirando-se aleatoriamente uma única bola dessa urna, a probabilidade de que ela seja branca é:',
+                options: {
+                    A: '5/7.',
+                    B: '7/12.',
+                    C: '5/12.',
+                    D: '1/5.'
+                },
+                answer: 'C',
+                explanation: 'Gabarito Oficial UECE: C. Total de casos possíveis (espaço amostral) = 5 + 7 = 12 bolas. Casos favoráveis (bolas brancas) = 5. Portanto, P = 5/12.'
+            },
+
+            // --- FÍSICA ---
+            {
+                id: 'q-fis-1',
+                subject: 'Física',
+                topic: 'Mecânica e Termologia',
+                exam: 'UECE 2023.2 - 1ª Fase (Questão Oficial)',
+                statement: 'Um automóvel parte do repouso e desenvolve movimento retilíneo uniformemente variado com aceleração escalar constante de 2,0 m/s². A distância percorrida por esse veículo após 10 segundos de movimento é:',
+                options: {
+                    A: '20 m.',
+                    B: '50 m.',
+                    C: '100 m.',
+                    D: '200 m.'
+                },
+                answer: 'C',
+                explanation: 'Gabarito Oficial UECE: C. Pela função horária da posição no MRUV: ΔS = v₀·t + (a·t²)/2. Como parte do repouso (v₀ = 0): ΔS = 0 + (2,0 · 10²)/2 = (2 · 100)/2 = 100 m.'
+            },
+            {
+                id: 'q-fis-2',
+                subject: 'Física',
+                topic: 'Eletricidade e Ondulatória',
+                exam: 'UECE 2021.1 - 1ª Fase (Questão Oficial)',
+                statement: 'Três resistores ôhmicos idênticos, cada um com resistência elétrica igual a 12 Ω, são associados em paralelo. A resistência elétrica equivalente dessa associação é:',
+                options: {
+                    A: '36 Ω.',
+                    B: '12 Ω.',
+                    C: '4 Ω.',
+                    D: '3 Ω.'
+                },
+                answer: 'C',
+                explanation: 'Gabarito Oficial UECE: C. Para n resistores idênticos associados em paralelo, a resistência equivalente é dada por Req = R / n = 12 Ω / 3 = 4 Ω.'
+            },
+
+            // --- FILOSOFIA, SOCIOLOGIA & ATUALIDADES ---
+            {
+                id: 'q-fil-1',
+                subject: 'Filosofia',
+                topic: 'Filosofia Antiga, Moderna e Contemporânea',
+                exam: 'UECE 2023.1 - 1ª Fase (Questão Oficial)',
+                statement: 'Na obra "O Príncipe", Nicolau Maquiavel rompe com a tradição filosófica clássica e medieval ao analisar a política a partir da "verità effettuale" (verdade efetiva das coisas). Para o pensador florentino, a virtù de um governante consiste na:',
+                options: {
+                    A: 'submissão incondicional das decisões de Estado aos dogmas morais da Igreja.',
+                    B: 'capacidade política, astúcia e flexibilidade do governante para agir conforme as circunstâncias (fortuna), visando conquistar e manter a estabilidade do Estado.',
+                    C: 'contemplação passiva do mundo inteligível das ideias puras, afastando-se dos conflitos humanos.',
+                    D: 'abolição completa de qualquer forma de autoridade estatal em favor do estado de natureza.'
+                },
+                answer: 'B',
+                explanation: 'Gabarito Oficial UECE: B. Para Maquiavel, a política possui autonomia frente à moral religiosa: o príncipe precisa ter virtù (habilidade, força e prudência política) para domar a fortuna (o acaso/circunstâncias) e garantir a manutenção e a ordem do Estado.'
+            },
+            {
+                id: 'q-soc-1',
+                subject: 'Sociologia',
+                topic: 'Clássicos e Sociologia Contemporânea',
+                exam: 'UECE 2022.2 - 1ª Fase (Questão Oficial)',
+                statement: 'Na teoria sociológica de Max Weber, o conceito de "ação social" é central para compreender a sociedade. Segundo esse autor, uma ação é considerada social quando:',
+                options: {
+                    A: 'é determinada exclusivamente por instintos biológicos hereditários comuns a toda a espécie.',
+                    B: 'o agente atribui a ela um sentido subjetivo que se orienta pela conduta passada, presente ou futura de outros indivíduos.',
+                    C: 'impõe-se de forma totalmente externa e coercitiva sobre a consciência individual, independentemente da vontade do sujeito.',
+                    D: 'decorre unicamente da posição econômica ocupada pelo indivíduo nas relações materiais de produção.'
+                },
+                answer: 'B',
+                explanation: 'Gabarito Oficial UECE: B. Na sociologia compreensiva de Max Weber, a ação social é toda conduta humana dotada de sentido subjetivo atribuído pelo agente e orientada pelo comportamento de outros indivíduos (classificada em racional com relação a fins, racional com relação a valores, afetiva e tradicional).'
+            },
+            {
+                id: 'q-atu-1',
+                subject: 'Atualidades',
+                topic: 'Atualidades e Saúde Única',
+                exam: 'UECE 2024.1 - 1ª Fase (Questão Oficial)',
+                statement: 'As conferências das partes da ONU sobre Mudanças Climáticas (COP) têm debatido medidas urgentes para conter o aquecimento global e seus impactos sobre a biodiversidade e a saúde pública. Entre os principais compromissos discutidos nessas cúpulas internacionais destaca-se:',
+                options: {
+                    A: 'a transição energética com redução gradual do uso de combustíveis fósseis, o combate ao desmatamento e o financiamento climático para países em desenvolvimento.',
+                    B: 'a expansão irrestrita das usinas termelétricas a carvão mineral como principal alternativa limpa para o século XXI.',
+                    C: 'a extinção das áreas de preservação ambiental em biomas tropicais para ampliar a monocultura extensiva.',
+                    D: 'a desvinculação total entre emissões de gases de efeito estufa e eventos climáticos extremos como secas severas e enchentes.'
+                },
+                answer: 'A',
+                explanation: 'Gabarito Oficial UECE: A. As cúpulas climáticas da ONU (Acordo de Paris e COPs recentes) estabelecem metas de mitigação das emissões de gases de efeito estufa, transição para energias renováveis (como solar, eólica e hidrogênio verde), desmatamento zero e financiamento climático.'
+            }
+        ];
+
+        // Gêneros Textuais da Redação UECE
+        const GENEROS_REDACAO_UECE = [
+            { id: 'gen-1', name: 'Dissertação-Argumentativa (Padrão UECE)' },
+            { id: 'gen-2', name: 'Artigo de Opinião (Com título e assinatura/pseudônimo)' },
+            { id: 'gen-3', name: 'Carta Aberta (Destinatário coletivo/autoridade)' },
+            { id: 'gen-4', name: 'Carta do Leitor (Resposta a matéria jornalística)' },
+            { id: 'gen-5', name: 'Editorial (Voz institucional de jornal/revista)' },
+            { id: 'gen-6', name: 'Crônica Argumentativa / Narrativa' }
+        ];
+
+        // =========================================================================
+        // 3. ESTADO GLOBAL E PERSISTÊNCIA (LOCALSTORAGE)
+        // =========================================================================
+        const STORAGE_KEY = 'vetuece_2027_state_v2';
+
+        let appState = {
+            theme: 'light',
+            activeMonth: 'dezembro',
+            activeWeek: 1,
+            completedBlocks: {},
+            questionLogs: {},
+            editalChecked: {},
+            generosChecked: {},
+            exerciseAnswers: {},
+            simulados: []
+        };
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    appState = {
+                        ...appState,
+                        ...parsed,
+                        completedBlocks: parsed.completedBlocks || {},
+                        questionLogs: parsed.questionLogs || {},
+                        editalChecked: parsed.editalChecked || {},
+                        generosChecked: parsed.generosChecked || {},
+                        exerciseAnswers: parsed.exerciseAnswers || {},
+                        simulados: Array.isArray(parsed.simulados) ? parsed.simulados : []
+                    };
+                }
+            } catch (err) {
+                console.warn('Erro ao carregar dados salvos:', err);
+            }
+            applyTheme();
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+            } catch (err) {
+                console.warn('Erro ao salvar dados:', err);
+            }
+        }
+
+        // =========================================================================
+        // 4. TEMA, NAVEGAÇÃO POR ABAS, TOASTS, MODAIS E POMODORO
+        // =========================================================================
+        function applyTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            if (appState.theme === 'dark') {
+                html.classList.add('dark');
+                if (icon) icon.className = 'fa-solid fa-sun text-sm';
+            } else {
+                html.classList.remove('dark');
+                if (icon) icon.className = 'fa-solid fa-moon text-sm';
+            }
+        }
+
+        function toggleTheme() {
+            appState.theme = appState.theme === 'dark' ? 'light' : 'dark';
+            applyTheme();
+            saveState();
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(sec => sec.classList.add('hidden'));
+            const target = document.getElementById(`tab-${tabName}`);
+            if (target) target.classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('text-slate-600', 'dark:text-slate-400');
+            });
+
+            const activeBtn = document.getElementById(`nav-${tabName}`);
+            if (activeBtn) {
+                activeBtn.classList.add('tab-active');
+                activeBtn.classList.remove('text-slate-600', 'dark:text-slate-400');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const colors = {
+                success: 'bg-emerald-600 text-white border-emerald-500',
+                warning: 'bg-amber-600 text-white border-amber-500',
+                info: 'bg-slate-900 text-white border-slate-700'
+            };
+            const icons = {
+                success: 'fa-circle-check',
+                warning: 'fa-triangle-exclamation',
+                info: 'fa-circle-info'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl border text-xs sm:text-sm font-medium transition-all duration-300 ${colors[type] || colors.info}`;
+            toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info}"></i><span>${message}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(8px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        function showCustomConfirm(title, message, onConfirm) {
+            const modal = document.getElementById('custom-modal');
+            const titleEl = document.getElementById('modal-title');
+            const msgEl = document.getElementById('modal-message');
+            const cancelBtn = document.getElementById('modal-cancel');
+            const confirmBtn = document.getElementById('modal-confirm');
+
+            if (!modal) return;
+            titleEl.textContent = title;
+            msgEl.textContent = message;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            const closeModal = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            };
+
+            cancelBtn.onclick = closeModal;
+            confirmBtn.onclick = () => {
+                closeModal();
+                if (typeof onConfirm === 'function') onConfirm();
+            };
+        }
+
+        // Timer Pomodoro (50/10 e 25/5)
+        let pomodoroState = {
+            preset: 50,
+            isBreak: false,
+            secondsLeft: 50 * 60,
+            timerId: null
+        };
+
+        function updatePomodoroDisplay() {
+            const display = document.getElementById('pomodoro-display');
+            const badge = document.getElementById('pomodoro-mode-badge');
+            const btn = document.getElementById('pomodoro-toggle-btn');
+            if (!display) return;
+
+            const mins = Math.floor(pomodoroState.secondsLeft / 60).toString().padStart(2, '0');
+            const secs = (pomodoroState.secondsLeft % 60).toString().padStart(2, '0');
+            display.textContent = `${mins}:${secs}`;
+
+            if (badge) {
+                if (pomodoroState.isBreak) {
+                    const breakLen = pomodoroState.preset === 50 ? 10 : 5;
+                    badge.textContent = `Pausa ${breakLen}m`;
+                } else {
+                    badge.textContent = `Foco ${pomodoroState.preset}m`;
+                }
+            }
+
+            if (btn) {
+                btn.innerHTML = pomodoroState.timerId
+                    ? '<i class="fa-solid fa-pause"></i>'
+                    : '<i class="fa-solid fa-play"></i>';
+            }
+        }
+
+        function togglePomodoro() {
+            if (pomodoroState.timerId) {
+                clearInterval(pomodoroState.timerId);
+                pomodoroState.timerId = null;
+                updatePomodoroDisplay();
+                return;
+            }
+
+            pomodoroState.timerId = setInterval(() => {
+                if (pomodoroState.secondsLeft > 0) {
+                    pomodoroState.secondsLeft--;
+                    updatePomodoroDisplay();
+                } else {
+                    clearInterval(pomodoroState.timerId);
+                    pomodoroState.timerId = null;
+                    pomodoroState.isBreak = !pomodoroState.isBreak;
+                    const nextMins = pomodoroState.isBreak
+                        ? (pomodoroState.preset === 50 ? 10 : 5)
+                        : pomodoroState.preset;
+                    pomodoroState.secondsLeft = nextMins * 60;
+                    updatePomodoroDisplay();
+                    showToast(
+                        pomodoroState.isBreak
+                            ? 'Tempo de foco concluído! Hora de descansar alguns minutos.'
+                            : 'Pausa finalizada! Vamos voltar aos estudos para a UECE.',
+                        'success'
+                    );
+                }
+            }, 1000);
+            updatePomodoroDisplay();
+        }
+
+        function resetPomodoro() {
+            if (pomodoroState.timerId) {
+                clearInterval(pomodoroState.timerId);
+                pomodoroState.timerId = null;
+            }
+            pomodoroState.isBreak = false;
+            pomodoroState.secondsLeft = pomodoroState.preset * 60;
+            updatePomodoroDisplay();
+        }
+
+        function switchPomodoroPreset() {
+            pomodoroState.preset = pomodoroState.preset === 50 ? 25 : 50;
+            resetPomodoro();
+            showToast(`Ciclo Pomodoro alterado para ${pomodoroState.preset}/${pomodoroState.preset === 50 ? 10 : 5} min.`, 'info');
+        }
+
+        // =========================================================================
+        // 5. CRONOGRAMA SEMANAL (DEZEMBRO A ABRIL)
+        // =========================================================================
+        function selectMonth(monthId) {
+            appState.activeMonth = monthId;
+            appState.activeWeek = 1;
+            saveState();
+            renderSchedule();
+        }
+
+        function selectWeek(weekNum) {
+            appState.activeWeek = weekNum;
+            saveState();
+            renderSchedule();
+        }
+
+        function toggleBlockComplete(blockId) {
+            if (appState.completedBlocks[blockId]) {
+                delete appState.completedBlocks[blockId];
+            } else {
+                appState.completedBlocks[blockId] = true;
+                showToast('Bloco concluído! Excelente progresso rumo à UECE.', 'success');
+            }
+            saveState();
+            renderSchedule();
+            updateDashboard();
+        }
+
+        function updateQuestionLog(blockId, field, value) {
+            const num = Math.max(0, parseInt(value) || 0);
+            if (!appState.questionLogs[blockId]) {
+                appState.questionLogs[blockId] = { done: 0, correct: 0 };
+            }
+            appState.questionLogs[blockId][field] = num;
+            if (appState.questionLogs[blockId].correct > appState.questionLogs[blockId].done) {
+                appState.questionLogs[blockId].correct = appState.questionLogs[blockId].done;
+            }
+            saveState();
+            updateDashboard();
+        }
+
+        function openExercisesForSubject(subject) {
+            const validSubjects = ['Biologia', 'Química', 'História', 'Geografia', 'Linguagens', 'Matemática', 'Física', 'Filosofia', 'Sociologia', 'Atualidades'];
+            const filterEl = document.getElementById('ex-filter-subject');
+            if (filterEl) {
+                filterEl.value = validSubjects.includes(subject) ? subject : 'ALL';
+                onExerciseSubjectChange();
+            }
+            switchTab('exercicios');
+        }
+
+        function renderSchedule() {
+            const monthSelector = document.getElementById('month-selector');
+            const banner = document.getElementById('month-cycle-banner');
+            const weekSelector = document.getElementById('week-selector');
+            const daysContainer = document.getElementById('days-container');
+            const subjectFilter = document.getElementById('subject-filter')?.value || 'ALL';
+
+            if (!monthSelector || !daysContainer) return;
+
+            // 1. Botões de Mês
+            monthSelector.innerHTML = Object.values(MONTHS_META).map(m => {
+                const isActive = appState.activeMonth === m.id;
+                return `
+                    <button onclick="selectMonth('${m.id}')" class="px-3 py-2.5 rounded-xl text-left border transition ${
+                        isActive
+                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                            : 'bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-emerald-400'
+                    }">
+                        <div class="text-xs sm:text-sm font-extrabold">${m.name}</div>
+                        <div class="text-[10px] truncate ${isActive ? 'text-emerald-100' : 'text-slate-500 dark:text-slate-400'}">${m.subtitle.split(':')[0]}</div>
+                    </button>
+                `;
+            }).join('');
+
+            // 2. Banner do Ciclo Mensal
+            const currentMonthMeta = MONTHS_META[appState.activeMonth] || MONTHS_META.dezembro;
+            if (banner) {
+                banner.innerHTML = `
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">${currentMonthMeta.subtitle}</div>
+                        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">${currentMonthMeta.description}</p>
+                    </div>
+                    <span class="shrink-0 text-xs font-bold px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
+                        Seg–Sáb • Dom Livre
+                    </span>
+                `;
+            }
+
+            // 3. Seletor de Semanas
+            const monthWeeks = SCHEDULE_DATA[appState.activeMonth] || [];
+            if (weekSelector) {
+                weekSelector.innerHTML = monthWeeks.map(w => {
+                    const isActive = appState.activeWeek === w.week;
+                    return `
+                        <button onclick="selectWeek(${w.week})" class="whitespace-nowrap px-4 py-2 rounded-xl text-xs font-bold transition border ${
+                            isActive
+                                ? 'bg-blue-900 text-white border-blue-900 shadow-sm'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+                        }">
+                            Semana ${w.week}
+                        </button>
+                    `;
+                }).join('');
+            }
+
+            // 4. Dias da Semana Selecionada
+            const weekObj = monthWeeks.find(w => w.week === appState.activeWeek) || monthWeeks[0];
+            if (!weekObj) return;
+
+            let html = `
+                <div class="flex items-center justify-between px-1">
+                    <h3 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white">${weekObj.title}</h3>
+                </div>
+            `;
+
+            weekObj.days.forEach(dayObj => {
+                const filteredBlocks = subjectFilter === 'ALL'
+                    ? dayObj.blocks
+                    : dayObj.blocks.filter(b => b.subject === subjectFilter);
+
+                if (filteredBlocks.length === 0) return;
+
+                html += `
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border ${dayObj.isSimuladoDay ? 'border-amber-300 dark:border-amber-800/80' : 'border-slate-200 dark:border-slate-800'} shadow-sm space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                            <div class="flex items-center gap-2.5">
+                                <span class="px-3 py-1 rounded-xl text-xs font-extrabold ${
+                                    dayObj.isSimuladoDay
+                                        ? 'bg-amber-100 text-amber-900 dark:bg-amber-900/50 dark:text-amber-200'
+                                        : 'bg-blue-100 text-blue-900 dark:bg-blue-900/50 dark:text-blue-200'
+                                }">
+                                    ${dayObj.day}
+                                </span>
+                                <span class="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300">${dayObj.focus}</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            ${filteredBlocks.map(block => {
+                                const isDone = !!appState.completedBlocks[block.id];
+                                const log = appState.questionLogs[block.id] || { done: 0, correct: 0 };
+                                const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(buildUeceYoutubeQuery(block))}`;
+                                const channelBadge = formatUeceChannelTag('', block.subject);
+
+                                return `
+                                    <div class="p-4 rounded-2xl border transition ${
+                                        isDone
+                                            ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800/70'
+                                            : 'bg-slate-50/70 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/80'
+                                    }">
+                                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                                            <div class="flex items-start gap-3">
+                                                <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleBlockComplete('${block.id}')" class="mt-1 w-5 h-5 accent-emerald-600 rounded cursor-pointer shrink-0">
+                                                <div class="space-y-1">
+                                                    <div class="flex flex-wrap items-center gap-2">
+                                                        <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-lg bg-slate-900 text-white dark:bg-slate-700">${block.subject}</span>
+                                                        <span class="text-[11px] font-semibold px-2 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                                                            ${channelBadge}
+                                                        </span>
+                                                        ${block.priority ? '<span class="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300">Alta Incidência UECE</span>' : ''}
+                                                    </div>
+                                                    <p class="text-sm font-semibold ${isDone ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-100'}">
+                                                        ${block.topic}
+                                                    </p>
+                                                    <div class="flex flex-wrap items-center gap-2 pt-1.5">
+                                                        <a href="${ytUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition shadow-sm">
+                                                            <i class="fa-brands fa-youtube"></i> Aula UECE no YouTube
+                                                        </a>
+                                                        ${!block.isEssay && block.subject !== 'Simulado' ? `
+                                                            <button onclick="openExercisesForSubject('${block.subject}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-sm">
+                                                                <i class="fa-solid fa-pen-to-square"></i> Questões UECE (${block.questions}q)
+                                                            </button>
+                                                        ` : ''}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Controle de Questões / Redação do Bloco -->
+                                            <div class="flex items-center gap-2 sm:gap-3 bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 shrink-0 self-start lg:self-center">
+                                                ${block.isEssay ? `
+                                                    <div class="text-xs">
+                                                        <span class="font-bold text-amber-600 dark:text-amber-400">Meta: 1 Redação UECE</span>
+                                                        <div class="text-[11px] text-slate-500">Marque ao concluir</div>
+                                                    </div>
+                                                ` : `
+                                                    <div class="text-xs">
+                                                        <span class="block text-[10px] font-bold uppercase text-slate-400">Meta: ${block.questions}q</span>
+                                                        <div class="flex items-center gap-1.5 mt-1">
+                                                            <label class="text-[11px] text-slate-500">Feitas:</label>
+                                                            <input type="number" min="0" max="200" value="${log.done || ''}" placeholder="0" onchange="updateQuestionLog('${block.id}', 'done', this.value)" class="w-12 text-xs text-center font-bold rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 py-1">
+                                                            <label class="text-[11px] text-slate-500">Acertos:</label>
+                                                            <input type="number" min="0" max="200" value="${log.correct || ''}" placeholder="0" onchange="updateQuestionLog('${block.id}', 'correct', this.value)" class="w-12 text-xs text-center font-bold rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 py-1 text-emerald-600">
+                                                        </div>
+                                                    </div>
+                                                `}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Card fixo do Domingo de Descanso
+            if (subjectFilter === 'ALL') {
+                html += `
+                    <div class="rounded-2xl p-5 bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-950/30 dark:to-blue-950/30 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-couch"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white">Domingo • Dia Oficial de Descanso</span>
+                                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-900 dark:bg-emerald-900 dark:text-emerald-200">0 Questões</span>
+                                </div>
+                                <p class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                                    Descanse a mente, durma bem, recarregue as energias e cuide da sua saúde mental para começar a próxima semana com foco total!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            daysContainer.innerHTML = html;
+        }
+
+        // =========================================================================
+        // 6. BANCO INTERATIVO DE EXERCÍCIOS UECE (PADRÃO CEV)
+        // =========================================================================
+        function onExerciseSubjectChange() {
+            populateExerciseTopics();
+            renderExercises();
+        }
+
+        function populateExerciseTopics() {
+            const subj = document.getElementById('ex-filter-subject')?.value || 'ALL';
+            const topicSelect = document.getElementById('ex-filter-topic');
+            if (!topicSelect) return;
+
+            const filtered = subj === 'ALL'
+                ? UECE_EXERCISES_DB
+                : UECE_EXERCISES_DB.filter(q => q.subject === subj);
+
+            const uniqueTopics = [...new Set(filtered.map(q => q.topic))];
+            topicSelect.innerHTML = `<option value="ALL">Todos os Assuntos (${uniqueTopics.length})</option>` +
+                uniqueTopics.map(t => `<option value="${t}">${t}</option>`).join('');
+
+            const ytBtn = document.getElementById('ex-more-yt-btn');
+            if (ytBtn) {
+                const qTerm = subj === 'ALL' ? 'resolucao questoes UECE biologia quimica' : `resolucao questoes UECE ${subj}`;
+                ytBtn.href = `https://www.youtube.com/results?search_query=${encodeURIComponent(qTerm)}`;
+            }
+        }
+
+        function answerExercise(qId, optionLetter) {
+            appState.exerciseAnswers[qId] = optionLetter;
+            saveState();
+            renderExercises();
+            updateDashboard();
+        }
+
+        function resetExercisesProgress() {
+            showCustomConfirm(
+                'Reiniciar Banco de Exercícios?',
+                'Isso limpará suas respostas nas questões comentadas da aba Exercícios UECE para você refazê-las.',
+                () => {
+                    appState.exerciseAnswers = {};
+                    saveState();
+                    renderExercises();
+                    updateDashboard();
+                    showToast('Respostas do banco de exercícios reiniciadas.', 'info');
+                }
+            );
+        }
+
+        function renderExercises() {
+            const listEl = document.getElementById('exercises-list');
+            if (!listEl) return;
+
+            const subj = document.getElementById('ex-filter-subject')?.value || 'ALL';
+            const topic = document.getElementById('ex-filter-topic')?.value || 'ALL';
+            const status = document.getElementById('ex-filter-status')?.value || 'ALL';
+            const search = (document.getElementById('ex-search')?.value || '').trim().toLowerCase();
+
+            // Atualiza placar geral do banco
+            let totalAnswered = 0;
+            let totalCorrect = 0;
+            UECE_EXERCISES_DB.forEach(q => {
+                const userAns = appState.exerciseAnswers[q.id];
+                if (userAns) {
+                    totalAnswered++;
+                    if (userAns === q.answer) totalCorrect++;
+                }
+            });
+
+            const scoreCorrectEl = document.getElementById('ex-score-correct');
+            const scoreTotalEl = document.getElementById('ex-score-total');
+            const scorePctEl = document.getElementById('ex-score-pct');
+            if (scoreCorrectEl) scoreCorrectEl.textContent = totalCorrect;
+            if (scoreTotalEl) scoreTotalEl.textContent = totalAnswered;
+            if (scorePctEl) {
+                const pct = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+                scorePctEl.textContent = `${pct}%`;
+            }
+
+            // Filtra questões
+            const questions = UECE_EXERCISES_DB.filter(q => {
+                if (subj !== 'ALL' && q.subject !== subj) return false;
+                if (topic !== 'ALL' && q.topic !== topic) return false;
+                const userAns = appState.exerciseAnswers[q.id];
+                if (status === 'UNANSWERED' && userAns) return false;
+                if (status === 'CORRECT' && userAns !== q.answer) return false;
+                if (status === 'WRONG' && (!userAns || userAns === q.answer)) return false;
+                if (search) {
+                    const hay = `${q.statement} ${q.topic} ${q.subject} ${Object.values(q.options).join(' ')}`.toLowerCase();
+                    if (!hay.includes(search)) return false;
+                }
+                return true;
+            });
+
+            if (questions.length === 0) {
+                listEl.innerHTML = `
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 text-center space-y-2">
+                        <i class="fa-solid fa-magnifying-glass text-2xl text-slate-400"></i>
+                        <h3 class="font-bold text-base text-slate-800 dark:text-white">Nenhuma questão encontrada com esses filtros</h3>
+                        <p class="text-xs text-slate-500">Tente limpar a busca ou selecionar "Todas as Disciplinas".</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = questions.map((q, index) => {
+                const userAns = appState.exerciseAnswers[q.id];
+                const isAnswered = !!userAns;
+                const isRight = userAns === q.answer;
+                const ytQuestUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(`UECE ${q.subject} ${q.topic} questoes resolvidas`)}`;
+
+                return `
+                    <article class="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="px-2.5 py-1 rounded-lg bg-blue-900 text-white text-xs font-extrabold">Questão ${index + 1}</span>
+                                <span class="px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-xs font-bold">${q.subject}</span>
+                                <span class="text-xs font-semibold text-slate-600 dark:text-slate-300">${q.topic}</span>
+                            </div>
+                            <span class="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                                ${q.exam}
+                            </span>
+                        </div>
+
+                        <p class="text-sm sm:text-[15px] text-slate-800 dark:text-slate-100 leading-relaxed font-medium">
+                            ${q.statement}
+                        </p>
+
+                        <div class="space-y-2.5">
+                            ${Object.entries(q.options).map(([letter, text]) => {
+                                let btnStyle = 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 hover:border-blue-500 text-slate-800 dark:text-slate-200';
+                                let badgeStyle = 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300';
+
+                                if (isAnswered) {
+                                    if (letter === q.answer) {
+                                        btnStyle = 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-950 dark:text-emerald-100 font-semibold';
+                                        badgeStyle = 'bg-emerald-600 border-emerald-600 text-white';
+                                    } else if (letter === userAns && userAns !== q.answer) {
+                                        btnStyle = 'bg-rose-50 dark:bg-rose-950/40 border-rose-500 text-rose-950 dark:text-rose-100';
+                                        badgeStyle = 'bg-rose-600 border-rose-600 text-white';
+                                    } else {
+                                        btnStyle = 'bg-slate-50/50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-800 opacity-70';
+                                    }
+                                }
+
+                                return `
+                                    <button onclick="answerExercise('${q.id}', '${letter}')" class="w-full text-left p-3.5 rounded-xl border transition flex items-start gap-3 ${btnStyle}">
+                                        <span class="w-7 h-7 rounded-lg border flex items-center justify-center text-xs font-extrabold shrink-0 ${badgeStyle}">
+                                            ${letter})
+                                        </span>
+                                        <span class="text-xs sm:text-sm leading-relaxed pt-0.5">${text}</span>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+
+                        ${isAnswered ? `
+                            <div class="p-4 rounded-xl border ${isRight ? 'bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800' : 'bg-amber-50/80 dark:bg-amber-950/30 border-amber-300 dark:border-amber-800'} space-y-2">
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <span class="text-xs font-extrabold ${isRight ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">
+                                        ${isRight ? '<i class="fa-solid fa-circle-check mr-1"></i> Você acertou! Gabarito oficial: ' + q.answer : '<i class="fa-solid fa-circle-xmark mr-1"></i> Você marcou ' + userAns + ' • Gabarito oficial: ' + q.answer}
+                                    </span>
+                                    <a href="${ytQuestUrl}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline inline-flex items-center gap-1">
+                                        <i class="fa-brands fa-youtube"></i> Ver + aulas deste assunto UECE
+                                    </a>
+                                </div>
+                                <p class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                                    ${q.explanation}
+                                </p>
+                            </div>
+                        ` : ''}
+                    </article>
+                `;
+            }).join('');
+        }
+
+        // =========================================================================
+        // 7. RENDERIZAÇÃO DO EDITAL VERTICALIZADO
+        // =========================================================================
+        function toggleEditalTopic(topicId) {
+            if (appState.editalChecked[topicId]) {
+                delete appState.editalChecked[topicId];
+            } else {
+                appState.editalChecked[topicId] = true;
+            }
+            saveState();
+            renderEdital();
+            updateDashboard();
+        }
+
+        function renderEdital() {
+            const container = document.getElementById('edital-container');
+            if (!container) return;
+
+            container.innerHTML = EDITAL_DATA.map(group => {
+                const total = group.topics.length;
+                const done = group.topics.filter(t => appState.editalChecked[t.id]).length;
+                const pct = total ? Math.round((done / total) * 100) : 0;
+
+                return `
+                    <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 space-y-3">
+                        <div class="flex items-start justify-between gap-2">
+                            <div>
+                                <h3 class="font-display font-bold text-base text-slate-900 dark:text-white">${group.subject}</h3>
+                                <span class="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">${group.weight}</span>
+                            </div>
+                            <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200">
+                                ${done}/${total} (${pct}%)
+                            </span>
+                        </div>
+                        <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-emerald-600 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                        </div>
+                        <div class="space-y-2 pt-1">
+                            ${group.topics.map(t => {
+                                const checked = !!appState.editalChecked[t.id];
+                                return `
+                                    <label class="flex items-start gap-2.5 p-2 rounded-xl hover:bg-white dark:hover:bg-slate-800 cursor-pointer transition">
+                                        <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleEditalTopic('${t.id}')" class="mt-0.5 w-4 h-4 accent-emerald-600 rounded shrink-0">
+                                        <span class="text-xs leading-relaxed ${checked ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'}">${t.text}</span>
+                                    </label>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // =========================================================================
+        // 8. TRACKER DE SIMULADOS E REDAÇÕES
+        // =========================================================================
+        function updateSimuladoMax() {
+            const tipo = document.getElementById('sim-tipo').value;
+            const totalInput = document.getElementById('sim-total');
+            if (tipo.includes('85q')) totalInput.value = 85;
+            else if (tipo.includes('60q')) totalInput.value = 60;
+            else totalInput.value = 40;
+        }
+
+        function addSimulado(e) {
+            e.preventDefault();
+            const nome = document.getElementById('sim-nome').value.trim();
+            const mes = document.getElementById('sim-mes').value;
+            const tipo = document.getElementById('sim-tipo').value;
+            const acertos = parseInt(document.getElementById('sim-acertos').value) || 0;
+            const total = Math.max(1, parseInt(document.getElementById('sim-total').value) || 85);
+            const redacao = document.getElementById('sim-redacao').value ? parseFloat(document.getElementById('sim-redacao').value) : null;
+            const erros = document.getElementById('sim-erros').value.trim();
+
+            appState.simulados.push({
+                id: Date.now().toString(),
+                nome,
+                mes,
+                tipo,
+                acertos: Math.min(acertos, total),
+                total,
+                redacao,
+                erros,
+                date: new Date().toLocaleDateString('pt-BR')
+            });
+
+            saveState();
+            e.target.reset();
+            document.getElementById('sim-total').value = 85;
+            renderSimulados();
+            updateDashboard();
+            showToast('Simulado registrado com sucesso! Continue evoluindo.', 'success');
+        }
+
+        function deleteSimulado(id) {
+            showCustomConfirm('Excluir Simulado', 'Deseja realmente remover este registro de simulado do seu histórico?', () => {
+                appState.simulados = appState.simulados.filter(s => s.id !== id);
+                saveState();
+                renderSimulados();
+                updateDashboard();
+                showToast('Simulado removido.', 'info');
+            });
+        }
+
+        function toggleGeneroRedacao(genId) {
+            if (appState.generosChecked[genId]) {
+                delete appState.generosChecked[genId];
+            } else {
+                appState.generosChecked[genId] = true;
+            }
+            saveState();
+            renderSimulados();
+        }
+
+        function renderSimulados() {
+            // 1. Render Checklist Gêneros Redação
+            const generosContainer = document.getElementById('generos-redacao-list');
+            generosContainer.innerHTML = GENEROS_REDACAO_UECE.map(g => {
+                const checked = !!appState.generosChecked[g.id];
+                return `
+                    <label class="flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition ${
+                        checked 
+                        ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800' 
+                        : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700'
+                    }">
+                        <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleGeneroRedacao('${g.id}')" class="w-4 h-4 accent-emerald-600 rounded">
+                        <span class="text-xs font-semibold ${checked ? 'text-emerald-900 dark:text-emerald-300' : 'text-slate-700 dark:text-slate-300'}">${g.name}</span>
+                    </label>
+                `;
+            }).join('');
+
+            // 2. Render SVG Chart
+            const chartContainer = document.getElementById('simulados-chart-container');
+            if (appState.simulados.length === 0) {
+                chartContainer.innerHTML = `
+                    <div class="h-44 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center text-center p-4">
+                        <i class="fa-solid fa-chart-simple text-2xl text-slate-400 mb-2"></i>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Registre seu primeiro simulado ao lado para visualizar o gráfico de evolução de Dezembro a Abril!</p>
+                    </div>
+                `;
+            } else {
+                const data = appState.simulados.slice(-10); // últimos 10 simulados
+                const width = Math.max(520, data.length * 75);
+                const height = 210;
+                const padX = 45;
+                const padY = 25;
+                const plotW = width - padX * 2;
+                const plotH = height - padY * 2;
+
+                // Linha de corte ~68%
+                const cutoffY = padY + plotH * (1 - 0.68);
+
+                const points = data.map((s, idx) => {
+                    const pct = Math.round((s.acertos / s.total) * 100);
+                    const x = data.length === 1 ? width / 2 : padX + (idx / (data.length - 1)) * plotW;
+                    const y = padY + plotH * (1 - pct / 100);
+                    return { x, y, pct, label: s.mes.slice(0, 3), nome: s.nome };
+                });
+
+                const polylinePoints = points.map(p => `${p.x},${p.y}`).join(' ');
+
+                chartContainer.innerHTML = `
+                    <svg viewBox="0 0 ${width} ${height}" class="w-full h-52 select-none">
+                        <!-- Grid Lines -->
+                        ${[0, 25, 50, 75, 100].map(val => {
+                            const y = padY + plotH * (1 - val / 100);
+                            return `
+                                <line x1="${padX}" y1="${y}" x2="${width - padX}" y2="${y}" stroke="currentColor" class="text-slate-200 dark:text-slate-800" stroke-width="1" />
+                                <text x="${padX - 8}" y="${y + 4}" text-anchor="end" class="fill-slate-400 text-[10px] font-mono">${val}%</text>
+                            `;
+                        }).join('')}
+
+                        <!-- Linha de Corte Vet UECE (68%) -->
+                        <line x1="${padX}" y1="${cutoffY}" x2="${width - padX}" y2="${cutoffY}" stroke="#059669" stroke-dasharray="5,5" stroke-width="1.5" />
+                        <text x="${width - padX}" y="${cutoffY - 5}" text-anchor="end" class="fill-emerald-600 dark:fill-emerald-400 text-[10px] font-bold">Meta Corte (~68%)</text>
+
+                        <!-- Line Path -->
+                        ${points.length > 1 ? `<polyline fill="none" stroke="#1d4ed8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${polylinePoints}" />` : ''}
+
+                        <!-- Data Points -->
+                        ${points.map(p => `
+                            <circle cx="${p.x}" cy="${p.y}" r="5.5" fill="#059669" stroke="#ffffff" stroke-width="2" />
+                            <text x="${p.x}" y="${p.y - 10}" text-anchor="middle" class="fill-slate-800 dark:fill-white text-[11px] font-bold">${p.pct}%</text>
+                            <text x="${p.x}" y="${height - 5}" text-anchor="middle" class="fill-slate-500 text-[10px] font-semibold">${p.label}</text>
+                        `).join('')}
+                    </svg>
+                `;
+            }
+
+            // 3. Render History List
+            const historyList = document.getElementById('simulados-history-list');
+            if (appState.simulados.length === 0) {
+                historyList.innerHTML = `<p class="text-xs text-slate-500 dark:text-slate-400">Nenhum simulado registrado ainda.</p>`;
+            } else {
+                historyList.innerHTML = [...appState.simulados].reverse().map(s => {
+                    const pct = Math.round((s.acertos / s.total) * 100);
+                    return `
+                        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="space-y-1">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="font-bold text-sm text-slate-900 dark:text-white">${s.nome}</span>
+                                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300">${s.mes}</span>
+                                    <span class="text-[11px] text-slate-500">${s.tipo} • ${s.date}</span>
+                                </div>
+                                ${s.erros ? `<p class="text-xs text-slate-600 dark:text-slate-400"><strong>Lacunas:</strong> ${s.erros}</p>` : ''}
+                            </div>
+                            <div class="flex items-center gap-3 shrink-0">
+                                <div class="text-right">
+                                    <div class="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">${s.acertos}/${s.total} (${pct}%)</div>
+                                    ${s.redacao !== null ? `<div class="text-[11px] font-semibold text-amber-600 dark:text-amber-400">Redação: ${s.redacao}/60</div>` : ''}
+                                </div>
+                                <button onclick="deleteSimulado('${s.id}')" title="Remover" class="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition">
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // =========================================================================
+        // 9. DASHBOARD STATS & BACKUP
+        // =========================================================================
+        function updateDashboard() {
+            let totalBlocks = 0;
+            let doneBlocks = 0;
+            let totalQuestionsTarget = 0;
+            let totalQuestionsDone = 0;
+            let totalQuestionsCorrect = 0;
+            let essaysDone = 0;
+
+            const subjectStats = {};
+
+            Object.values(SCHEDULE_DATA).forEach(weeks => {
+                weeks.forEach(w => {
+                    w.days.forEach(d => {
+                        d.blocks.forEach(b => {
+                            totalBlocks++;
+                            if (!subjectStats[b.subject]) {
+                                subjectStats[b.subject] = { total: 0, done: 0 };
+                            }
+                            subjectStats[b.subject].total++;
+
+                            if (appState.completedBlocks[b.id]) {
+                                doneBlocks++;
+                                subjectStats[b.subject].done++;
+                                if (b.isEssay) essaysDone++;
+                            }
+
+                            if (!b.isEssay) {
+                                totalQuestionsTarget += b.questions;
+                            }
+
+                            const log = appState.questionLogs[b.id];
+                            if (log) {
+                                if (b.isEssay) {
+                                    if (log.done > 0 && !appState.completedBlocks[b.id]) essaysDone += log.done;
+                                } else {
+                                    totalQuestionsDone += (log.done || 0);
+                                    totalQuestionsCorrect += (log.correct || 0);
+                                }
+                            }
+                        });
+                    });
+                });
+            });
+
+            // Soma questões respondidas no banco 'Exercícios UECE'
+            Object.entries(appState.exerciseAnswers || {}).forEach(([qId, ans]) => {
+                const qObj = UECE_EXERCISES_DB.find(item => item.id === qId);
+                if (qObj) {
+                    totalQuestionsDone++;
+                    if (ans === qObj.answer) totalQuestionsCorrect++;
+                }
+            });
+
+            // Soma redações registradas nos simulados
+            appState.simulados.forEach(s => {
+                if (s.redacao !== null) essaysDone++;
+            });
+
+            // Atualiza KPIs
+            document.getElementById('kpi-blocks-done').textContent = doneBlocks;
+            document.getElementById('kpi-blocks-total').textContent = `/ ${totalBlocks} blocos`;
+            const blocksPct = totalBlocks ? Math.round((doneBlocks / totalBlocks) * 100) : 0;
+            document.getElementById('kpi-blocks-bar').style.width = `${blocksPct}%`;
+
+            document.getElementById('kpi-questions-done').textContent = totalQuestionsDone;
+            const accPct = totalQuestionsDone > 0 ? Math.round((totalQuestionsCorrect / totalQuestionsDone) * 100) : 0;
+            document.getElementById('kpi-questions-acc').textContent = `${accPct}% acerto`;
+            document.getElementById('kpi-questions-target').textContent = `Meta total do ciclo: ${totalQuestionsTarget.toLocaleString('pt-BR')} questões`;
+
+            // Simulados KPI
+            if (appState.simulados.length > 0) {
+                const avg = Math.round(appState.simulados.reduce((acc, s) => acc + (s.acertos / s.total) * 100, 0) / appState.simulados.length);
+                document.getElementById('kpi-simulados-avg').textContent = `${avg}%`;
+                document.getElementById('kpi-simulados-count').textContent = `(${appState.simulados.length} realizados)`;
+            } else {
+                document.getElementById('kpi-simulados-avg').textContent = `--%`;
+                document.getElementById('kpi-simulados-count').textContent = `(0 realizados)`;
+            }
+
+            // Redações & Edital KPI
+            document.getElementById('kpi-redacoes-count').textContent = essaysDone;
+            let totalEdital = 0, doneEdital = 0;
+            EDITAL_DATA.forEach(g => g.topics.forEach(t => {
+                totalEdital++;
+                if (appState.editalChecked[t.id]) doneEdital++;
+            }));
+            const editalPct = totalEdital ? Math.round((doneEdital / totalEdital) * 100) : 0;
+            document.getElementById('kpi-edital-pct').textContent = `${editalPct}% edital`;
+
+            // Barras por Disciplina
+            const subjectListEl = document.getElementById('subject-progress-list');
+            const orderedSubjects = ['Biologia', 'Química', 'Matemática', 'Física', 'Linguagens', 'História', 'Geografia', 'Filosofia', 'Sociologia', 'Atualidades', 'Redação', 'Simulado'];
+
+            subjectListEl.innerHTML = orderedSubjects.filter(s => subjectStats[s]).map(subj => {
+                const st = subjectStats[subj];
+                const pct = st.total ? Math.round((st.done / st.total) * 100) : 0;
+                const isVetWeight = subj === 'Biologia' || subj === 'Química';
+
+                return `
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                                ${subj}
+                                ${isVetWeight ? '<span class="px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-[10px]">Peso Vet</span>' : ''}
+                            </span>
+                            <span class="font-semibold text-slate-500 dark:text-slate-400">${st.done}/${st.total} (${pct}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                            <div class="${isVetWeight ? 'bg-emerald-600' : 'bg-blue-700'} h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function exportBackup() {
+            const dataStr = JSON.stringify(appState, null, 2);
+            const textarea = document.createElement('textarea');
+            textarea.value = dataStr;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('Backup do seu progresso copiado para a área de transferência! Cole em um bloco de notas para guardar.', 'success');
+            } catch (err) {
+                showToast('Não foi possível copiar automaticamente.', 'warning');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function confirmResetAll() {
+            showCustomConfirm(
+                'Zerar Todo o Progresso?',
+                'Isso apagará todas as aulas concluídas, questões registradas, simulados e tópicos marcados do edital. Essa ação não pode ser desfeita.',
+                () => {
+                    localStorage.removeItem(STORAGE_KEY);
+                    appState = {
+                        theme: appState.theme,
+                        activeMonth: 'dezembro',
+                        activeWeek: 1,
+                        completedBlocks: {},
+                        questionLogs: {},
+                        editalChecked: {},
+                        generosChecked: {},
+                        exerciseAnswers: {},
+                        simulados: []
+                    };
+                    saveState();
+                    updateDashboard();
+                    renderSchedule();
+                    populateExerciseTopics();
+                    renderExercises();
+                    renderEdital();
+                    renderSimulados();
+                    showToast('Progresso reiniciado com sucesso.', 'info');
+                }
+            );
+        }
+
+        // =========================================================================
+        // 10. INICIALIZAÇÃO
+        // =========================================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            updatePomodoroDisplay();
+            updateDashboard();
+            renderSchedule();
+            populateExerciseTopics();
+            renderExercises();
+            renderEdital();
+            renderSimulados();
+        });
+    </script>
+</body>
+</html>
